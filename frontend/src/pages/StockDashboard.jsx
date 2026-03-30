@@ -10,7 +10,7 @@ import ErrorState from '../components/common/ErrorState';
 import EmptyState from '../components/common/EmptyState';
 import StockBarChart from '../components/charts/StockBarChart';
 import ExportButton from '../components/common/ExportButton';
-import { exportStockReport } from '../utils/excelExport';
+import { exportStockReport, exportMaterialMovement } from '../utils/excelExport';
 import './StockDashboard.css';
 
 const MATERIAL_COLORS = {
@@ -64,7 +64,10 @@ export default function StockDashboard() {
     <div className="page-container" id="stock-dashboard">
       <div className="page-header">
         <h1 className="page-title"><Package size={24} /> Stock Dashboard</h1>
-        <ExportButton label="Export Stock Report" onClick={() => exportStockReport(stockData)} />
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <ExportButton label="Export Stock" onClick={() => exportStockReport(stockData)} />
+          <ExportButton label="Material Movement" onClick={() => exportMaterialMovement(stockData)} variant="secondary" />
+        </div>
       </div>
 
       {/* Current Stock Overview */}

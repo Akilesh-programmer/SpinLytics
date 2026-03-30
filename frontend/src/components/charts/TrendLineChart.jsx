@@ -29,13 +29,26 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function TrendLineChart({ data, lines, height = 300 }) {
   if (!data || data.length === 0) return null;
 
+  const len = data.length;
+  // Smart interval: show every label up to 15, every-other up to 20, every-3rd for 25+
+  const tickInterval = len <= 15 ? 0 : len <= 20 ? 1 : len <= 25 ? 2 : 3;
+  const dense = len > 15;
+
   return (
     <div className="card" style={{ padding: '16px' }}>
       <ResponsiveContainer width="100%" height={height}>
-        <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <LineChart data={data} margin={{ top: 10, right: 16, left: 0, bottom: dense ? 30 : 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-          <XAxis dataKey="name" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} axisLine={{ stroke: 'var(--border-color)' }} />
-          <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} axisLine={{ stroke: 'var(--border-color)' }} />
+          <XAxis
+            dataKey="name"
+            interval={tickInterval}
+            tick={{ fill: 'var(--text-secondary)', fontSize: dense ? 10 : 11 }}
+            angle={dense ? -45 : 0}
+            textAnchor={dense ? 'end' : 'middle'}
+            height={dense ? 50 : 30}
+            axisLine={{ stroke: 'var(--border-color)' }}
+          />
+          <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} axisLine={{ stroke: 'var(--border-color)' }} width={50} />
           <Tooltip content={<CustomTooltip />} />
           <Legend wrapperStyle={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }} />
           {lines.map((line) => (
@@ -46,7 +59,7 @@ export default function TrendLineChart({ data, lines, height = 300 }) {
               name={line.name}
               stroke={line.color}
               strokeWidth={2}
-              dot={{ r: 3, fill: line.color }}
+              dot={{ r: dense ? 2 : 3, fill: line.color }}
               activeDot={{ r: 5 }}
             />
           ))}

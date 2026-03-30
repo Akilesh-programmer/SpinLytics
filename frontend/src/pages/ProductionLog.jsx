@@ -6,7 +6,7 @@ import DataTable from '../components/common/DataTable';
 import Loader from '../components/common/Loader';
 import ErrorState from '../components/common/ErrorState';
 import ExportButton from '../components/common/ExportButton';
-import { exportProductionLog } from '../utils/excelExport';
+import { exportProductionLog, exportLossAnalysis, exportWeeklyProduction, exportFrameComparison } from '../utils/excelExport';
 import './ProductionLog.css';
 
 export default function ProductionLog() {
@@ -73,6 +73,9 @@ export default function ProductionLog() {
         <h1 className="page-title"><ClipboardList size={24} /> Production Log</h1>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <ExportButton label="Export Production" onClick={() => exportProductionLog(entries, filters.startDate && filters.endDate ? `${filters.startDate} to ${filters.endDate}` : '')} variant={entries.length > 0 ? 'primary' : 'secondary'} />
+          <ExportButton label="Weekly Summary" onClick={() => exportWeeklyProduction(entries, filters.startDate && filters.endDate ? `${filters.startDate} to ${filters.endDate}` : '')} variant="secondary" />
+          <ExportButton label="Frame Comparison" onClick={() => exportFrameComparison(entries, filters.startDate && filters.endDate ? `${filters.startDate} to ${filters.endDate}` : '')} variant="secondary" />
+          <ExportButton label="Loss Analysis" onClick={() => exportLossAnalysis(entries)} variant="secondary" />
           <button className="btn" onClick={refetch}><RefreshCw size={14} /> Refresh</button>
         </div>
       </div>

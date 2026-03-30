@@ -17,7 +17,7 @@ import MetricsDonut from '../components/charts/MetricsDonut';
 import TrendLineChart from '../components/charts/TrendLineChart';
 import DataTable from '../components/common/DataTable';
 import ExportButton from '../components/common/ExportButton';
-import { exportMonthlyRealisation } from '../utils/excelExport';
+import { exportMonthlyRealisation, exportMonthlyDaywise } from '../utils/excelExport';
 import './MonthlyDashboard.css';
 
 export default function MonthlyDashboard() {
@@ -72,22 +72,22 @@ export default function MonthlyDashboard() {
     { name: 'Autocorner', frame41: totalAuto * (parseFloat(production.frame41Kg) / (totalProd || 1)), frame47: totalAuto * (parseFloat(production.frame47Kg) / (totalProd || 1)) },
   ];
 
-  // Daily production trend from prodData
+  // Daily production trend from prodData — fill ALL days of month for even chart spacing
   const dailyTrend = [];
   if (prodData?.data) {
     const dayMap = {};
     for (const entry of prodData.data) {
       const day = new Date(entry.date).getDate();
-      if (!dayMap[day]) dayMap[day] = { name: `Day ${day}`, production: 0, autocorner: 0, packing: 0, ebUnits: 0, spindles: 0 };
+      if (!dayMap[day]) dayMap[day] = { name: `${day}`, production: 0, autocorner: 0, packing: 0, ebUnits: 0, spindles: 0 };
       dayMap[day].production += parseFloat(entry.productionKg);
       dayMap[day].autocorner += parseFloat(entry.autocornerProductionKg);
       dayMap[day].packing += parseFloat(entry.packingKg);
       dayMap[day].ebUnits += parseFloat(entry.ebUnits);
       dayMap[day].spindles += entry.noOfSpindles;
     }
-    const sortedDays = Object.keys(dayMap).sort((a, b) => Number(a) - Number(b));
-    for (const d of sortedDays) {
-      dailyTrend.push(dayMap[d]);
+    // Fill every day from 1 to lastDay so the chart X-axis is uniformly distributed
+    for (let d = 1; d <= lastDay; d++) {
+      dailyTrend.push(dayMap[d] || { name: `${d}`, production: 0, autocorner: 0, packing: 0, ebUnits: 0, spindles: 0 });
     }
   }
 
@@ -125,6 +125,7 @@ export default function MonthlyDashboard() {
         <h1 className="page-title"><CalendarDays size={24} /> Monthly Dashboard</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <ExportButton label="Export Monthly" onClick={() => exportMonthlyRealisation(data)} />
+          <ExportButton label="Day-wise Detail" onClick={() => exportMonthlyDaywise(data, prodData?.data)} variant="secondary" />
           <DatePicker label={nav.displayLabel} onPrev={nav.goPrev} onNext={nav.goNext} onToday={nav.goToday} todayLabel="This Month" />
         </div>
       </div>

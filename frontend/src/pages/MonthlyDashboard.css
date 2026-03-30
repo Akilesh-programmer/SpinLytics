@@ -1,0 +1,48 @@
+.monthly-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.monthly-section { margin-bottom: 24px; }
+.monthly-raw-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+.raw-material-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  animation: fadeInUp 0.35s ease backwards;
+}
+.raw-material-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.raw-material-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  font-variant-numeric: tabular-nums;
+}
+.raw-material-unit {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: 3px;
+}
+.monthly-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 900px) {
+  .monthly-top, .monthly-charts { grid-template-columns: 1fr; }
+  .monthly-raw-grid { grid-template-columns: repeat(2, 1fr); }
+}

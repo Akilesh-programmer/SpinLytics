@@ -16,6 +16,8 @@ import ProductionBarChart from '../components/charts/ProductionBarChart';
 import MetricsDonut from '../components/charts/MetricsDonut';
 import TrendLineChart from '../components/charts/TrendLineChart';
 import DataTable from '../components/common/DataTable';
+import ExportButton from '../components/common/ExportButton';
+import { exportMonthlyRealisation } from '../utils/excelExport';
 import './MonthlyDashboard.css';
 
 export default function MonthlyDashboard() {
@@ -121,7 +123,10 @@ export default function MonthlyDashboard() {
     <div className="page-container" id="monthly-dashboard">
       <div className="page-header">
         <h1 className="page-title"><CalendarDays size={24} /> Monthly Dashboard</h1>
-        <DatePicker label={nav.displayLabel} onPrev={nav.goPrev} onNext={nav.goNext} onToday={nav.goToday} todayLabel="This Month" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ExportButton label="Export Monthly" onClick={() => exportMonthlyRealisation(data)} />
+          <DatePicker label={nav.displayLabel} onPrev={nav.goPrev} onNext={nav.goNext} onToday={nav.goToday} todayLabel="This Month" />
+        </div>
       </div>
 
       {/* Row 1: Production KPIs */}

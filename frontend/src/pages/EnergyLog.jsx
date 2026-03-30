@@ -6,6 +6,8 @@ import KPICard from '../components/common/KPICard';
 import Loader from '../components/common/Loader';
 import ErrorState from '../components/common/ErrorState';
 import TrendLineChart from '../components/charts/TrendLineChart';
+import ExportButton from '../components/common/ExportButton';
+import { exportEBReport } from '../utils/excelExport';
 
 const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -48,6 +50,7 @@ export default function EnergyLog() {
     <div className="page-container" id="energy-log">
       <div className="page-header">
         <h1 className="page-title"><Zap size={24} /> Energy (EB) Log</h1>
+        <ExportButton label="Export EB Report" onClick={() => exportEBReport(entries)} variant={entries.length > 0 ? 'primary' : 'secondary'} />
       </div>
 
       <div className="grid-3" style={{ marginBottom: '24px' }}>

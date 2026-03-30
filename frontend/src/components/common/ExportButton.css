@@ -1,0 +1,53 @@
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.export-btn--primary {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff;
+  border-color: #059669;
+}
+.export-btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #047857, #059669);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.export-btn--secondary {
+  background: var(--bg-card, #1e293b);
+  color: var(--text-secondary, #94a3b8);
+  border-color: var(--border, #334155);
+}
+.export-btn--secondary:hover:not(:disabled) {
+  color: #10b981;
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.export-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.export-btn__spinner {
+  animation: export-spin 1s linear infinite;
+}
+
+.export-btn__arrow {
+  opacity: 0.6;
+}
+
+@keyframes export-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

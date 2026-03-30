@@ -12,6 +12,8 @@ import Loader from '../components/common/Loader';
 import ErrorState from '../components/common/ErrorState';
 import ProductionBarChart from '../components/charts/ProductionBarChart';
 import TrendLineChart from '../components/charts/TrendLineChart';
+import ExportButton from '../components/common/ExportButton';
+import { exportYearlySummary } from '../utils/excelExport';
 import './YearlyDashboard.css';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -127,7 +129,10 @@ export default function YearlyDashboard() {
     <div className="page-container" id="yearly-dashboard">
       <div className="page-header">
         <h1 className="page-title"><CalendarRange size={24} /> Yearly Dashboard</h1>
-        <DatePicker label={nav.displayLabel} onPrev={nav.goPrev} onNext={nav.goNext} onToday={nav.goToday} todayLabel="This Year" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ExportButton label="Export Yearly" onClick={() => exportYearlySummary(data)} />
+          <DatePicker label={nav.displayLabel} onPrev={nav.goPrev} onNext={nav.goNext} onToday={nav.goToday} todayLabel="This Year" />
+        </div>
       </div>
 
       {/* Row 1: Annual Production KPIs */}

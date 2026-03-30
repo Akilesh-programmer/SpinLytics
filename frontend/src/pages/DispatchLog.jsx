@@ -5,6 +5,8 @@ import { dispatchApi } from '../api/entries';
 import DataTable from '../components/common/DataTable';
 import Loader from '../components/common/Loader';
 import ErrorState from '../components/common/ErrorState';
+import ExportButton from '../components/common/ExportButton';
+import { exportDispatchLog } from '../utils/excelExport';
 import '../pages/ProductionLog.css';
 
 export default function DispatchLog() {
@@ -52,6 +54,7 @@ export default function DispatchLog() {
               </span>
             </>
           )}
+          <ExportButton label="Export Dispatch" onClick={() => exportDispatchLog(entries)} variant={entries.length > 0 ? 'primary' : 'secondary'} />
           <button className="btn" onClick={refetch}><RefreshCw size={14} /> Refresh</button>
         </div>
       </div>

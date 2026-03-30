@@ -5,6 +5,8 @@ import { packingApi } from '../api/entries';
 import DataTable from '../components/common/DataTable';
 import Loader from '../components/common/Loader';
 import ErrorState from '../components/common/ErrorState';
+import ExportButton from '../components/common/ExportButton';
+import { exportPackingLog } from '../utils/excelExport';
 import '../pages/ProductionLog.css';
 
 export default function PackingLog() {
@@ -35,7 +37,10 @@ export default function PackingLog() {
     <div className="page-container" id="packing-log">
       <div className="page-header">
         <h1 className="page-title"><PackageOpen size={24} /> Packing Log</h1>
-        <button className="btn" onClick={refetch}><RefreshCw size={14} /> Refresh</button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <ExportButton label="Export Packing" onClick={() => exportPackingLog(entries)} variant={entries.length > 0 ? 'primary' : 'secondary'} />
+          <button className="btn" onClick={refetch}><RefreshCw size={14} /> Refresh</button>
+        </div>
       </div>
 
       <div className="production-filters">

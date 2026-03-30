@@ -5,6 +5,8 @@ import { productionApi } from '../api/production';
 import DataTable from '../components/common/DataTable';
 import Loader from '../components/common/Loader';
 import ErrorState from '../components/common/ErrorState';
+import ExportButton from '../components/common/ExportButton';
+import { exportProductionLog } from '../utils/excelExport';
 import './ProductionLog.css';
 
 export default function ProductionLog() {
@@ -69,7 +71,10 @@ export default function ProductionLog() {
     <div className="page-container" id="production-log">
       <div className="page-header">
         <h1 className="page-title"><ClipboardList size={24} /> Production Log</h1>
-        <button className="btn" onClick={refetch}><RefreshCw size={14} /> Refresh</button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <ExportButton label="Export Production" onClick={() => exportProductionLog(entries, filters.startDate && filters.endDate ? `${filters.startDate} to ${filters.endDate}` : '')} variant={entries.length > 0 ? 'primary' : 'secondary'} />
+          <button className="btn" onClick={refetch}><RefreshCw size={14} /> Refresh</button>
+        </div>
       </div>
 
       {/* Filters */}

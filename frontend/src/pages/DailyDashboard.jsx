@@ -13,6 +13,8 @@ import ErrorState from '../components/common/ErrorState';
 import EmptyState from '../components/common/EmptyState';
 import ProductionBarChart from '../components/charts/ProductionBarChart';
 import DataTable from '../components/common/DataTable';
+import ExportButton from '../components/common/ExportButton';
+import { exportDailyProduction } from '../utils/excelExport';
 import './DailyDashboard.css';
 
 export default function DailyDashboard() {
@@ -39,12 +41,19 @@ export default function DailyDashboard() {
     <div className="page-container" id="daily-dashboard">
       <div className="page-header">
         <h1 className="page-title"><LayoutDashboard size={24} /> Daily Dashboard</h1>
-        <DatePicker
-          label={nav.displayLabel}
-          onPrev={nav.goPrev}
-          onNext={nav.goNext}
-          onToday={nav.goToday}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ExportButton
+            label="Export Daily Report"
+            onClick={() => exportDailyProduction(data, nav.dateStr)}
+            variant={frames.length > 0 ? 'primary' : 'secondary'}
+          />
+          <DatePicker
+            label={nav.displayLabel}
+            onPrev={nav.goPrev}
+            onNext={nav.goNext}
+            onToday={nav.goToday}
+          />
+        </div>
       </div>
 
       {frames.length === 0 ? (

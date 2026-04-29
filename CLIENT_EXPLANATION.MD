@@ -32,7 +32,7 @@ The factory has **two spinning machines**: Frame 41 and Frame 47. Each day, the 
 
 ## 1.2 — Stock Entry (Entered whenever materials move in/out)
 
-Every time raw materials arrive, are sent to production, dispatched to a buyer, or returned — a stock entry is created.
+Every time raw materials arrive, are sent to production, or returned — a stock entry is created.
 
 | What is entered | What it means | Example |
 |---|---|---|
@@ -49,16 +49,17 @@ Every time raw materials arrive, are sent to production, dispatched to a buyer, 
 | Transaction Type | What it means | Effect on Stock |
 |---|---|---|
 | **Purchase** | Raw material bought from supplier | Stock **increases** |
-| **Return** | Material returned back to stock | Stock **increases** |
 | **Issue** | Raw material sent from warehouse to the production floor | Stock **decreases** |
-| **Dispatch** | Finished goods sent out to buyer | Stock **decreases** |
+| **Return** | Material returned back to stock | Stock **increases** |
+
+> **Note:** Dispatch is NOT available on the Stock Entry page. All dispatches go through the dedicated **Dispatch Entry** page (Section 1.4), which automatically creates the stock transaction. This prevents accidental double-counting.
 
 **Automatic Conversion:** The operator enters **bags** — the system automatically converts to KG:
 ```
 KG = Bags × 60       (1 bag = 60 kg, always)
 ```
 
-**Safety Check:** Before allowing an Issue or Dispatch, the system checks whether there is enough stock. If someone tries to issue 600 kg of Cotton but only 300 kg is in stock, the system rejects it with: *"Insufficient stock for COTTON. Available: 300.000 kg, Requested: 600.000 kg"*.
+**Safety Check:** Before allowing an Issue, the system checks whether there is enough stock. If someone tries to issue 600 kg of Cotton but only 300 kg is in stock, the system rejects it with: *"Insufficient stock for COTTON. Available: 300.000 kg, Requested: 600.000 kg"*.
 
 ---
 
@@ -73,6 +74,10 @@ KG = Bags × 60       (1 bag = 60 kg, always)
 | **Lot No** | Which lot it belongs to |
 
 **Purpose:** Packing records connect production to stock — they show how much yarn was packed and ready for dispatch.
+
+> **Why does "Packing" appear in both Production Entry and Packing Entry?** They serve different purposes:
+> - **Production Entry → Packing (kg):** A production metric — how much of this frame's output was packed. Used to calculate **Autocorner Loss** (Autocorner − Packing). All loss calculations and reports use this value.
+> - **Packing Entry page:** A detailed packing log — records which yarn type, which lot, how many bags. Used for inventory tracking and dispatch preparation. This is NOT used in loss calculations.
 
 ---
 
@@ -101,8 +106,10 @@ Both happen together — if one fails, neither is saved. This ensures stock alwa
 |---|---|---|
 | **Month** | Which month | April |
 | **Year** | Which year | 2026 |
-| **Opening Units** | Meter reading at the start of the month | 10,000 |
+| **Opening Units** | Meter reading at the start of the month (auto-filled from previous month) | 10,000 |
 | **Closing Units** | Meter reading at the end of the month | 15,000 |
+
+**Smart auto-fill:** When you select a month, the system automatically checks the previous month's EB entry. If it exists, the Opening Units are **auto-filled** from the previous month's Closing Units (e.g., *"Auto-filled from March 2026 closing (15000)"*). If no previous month data exists, you enter Opening Units manually. You can always tap to override the auto-filled value.
 
 Only **one entry per month** is allowed.
 

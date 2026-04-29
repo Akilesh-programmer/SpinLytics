@@ -5,8 +5,8 @@ const createStockTransactionSchema = z.object({
   materialType: z.enum(['COTTON', 'VISCOSE', 'FIBER', 'EXCEL', 'YARN', 'WASTE'], {
     errorMap: () => ({ message: 'Invalid material type' }),
   }),
-  transactionType: z.enum(['PURCHASE', 'ISSUE', 'DISPATCH', 'RETURN'], {
-    errorMap: () => ({ message: 'Invalid transaction type' }),
+  transactionType: z.enum(['PURCHASE', 'ISSUE', 'RETURN'], {
+    errorMap: () => ({ message: 'Invalid transaction type. Use the Dispatch Entry for dispatches.' }),
   }),
   lotNo: z.string().min(1, 'Lot number is required').max(100),
   partyName: z.string().min(1, 'Party name is required').max(200),

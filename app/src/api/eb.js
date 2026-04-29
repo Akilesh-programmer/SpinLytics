@@ -11,4 +11,5 @@ export const ebApi = {
     return api.get(`/eb${qs ? `?${qs}` : ''}`);
   },
   getByMonthYear: (year, month) => api.get(`/eb/month/${year}/${month}`),
+  getPreviousClosing: (year, month) => api.get(`/eb/previous-closing/${year}/${month}`),
 };

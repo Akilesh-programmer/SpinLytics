@@ -13,6 +13,7 @@ const {
 router.post('/', validate({ body: createEBSchema }), controller.create);
 router.get('/', validate({ query: ebQuerySchema }), controller.getAll);
 router.get('/month/:year/:month', validate({ params: monthYearParamSchema }), controller.getByMonthYear);
+router.get('/previous-closing/:year/:month', validate({ params: monthYearParamSchema }), controller.getPreviousClosing);
 router.get('/:id', validate({ params: idParamSchema }), controller.getById);
 router.put('/:id', validate({ params: idParamSchema, body: updateEBSchema }), controller.update);
 router.delete('/:id', validate({ params: idParamSchema }), controller.remove);

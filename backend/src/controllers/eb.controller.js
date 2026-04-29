@@ -40,4 +40,13 @@ const remove = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, message: 'EB entry deleted' });
 });
 
-module.exports = { create, getAll, getById, getByMonthYear, update, remove };
+const getPreviousClosing = asyncHandler(async (req, res) => {
+  const result = await ebService.getPreviousClosing(
+    parseInt(req.params.month),
+    parseInt(req.params.year)
+  );
+  const response = ApiResponse.success(result, 'Previous closing retrieved');
+  res.status(response.statusCode).json(response);
+});
+
+module.exports = { create, getAll, getById, getByMonthYear, update, remove, getPreviousClosing };

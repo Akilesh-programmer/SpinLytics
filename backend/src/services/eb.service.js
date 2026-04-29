@@ -98,6 +98,37 @@ async function findByMonthYear(month, year) {
 }
 
 /**
+ * Get the closing units from the previous month's EB entry.
+ * Used to auto-populate opening units for the current month.
+ */
+async function getPreviousClosing(month, year) {
+  // Calculate the previous month (handle Jan → Dec rollback)
+  let prevMonth = month - 1;
+  let prevYear = year;
+  if (prevMonth < 1) {
+    prevMonth = 12;
+    prevYear = year - 1;
+  }
+
+  const entry = await prisma.eBEntry.findUnique({
+    where: {
+      month_year: { month: prevMonth, year: prevYear },
+    },
+  });
+
+  if (!entry) {
+    return { found: false, previousMonth: prevMonth, previousYear: prevYear, closingUnits: null };
+  }
+
+  return {
+    found: true,
+    previousMonth: prevMonth,
+    previousYear: prevYear,
+    closingUnits: parseFloat(entry.closingUnits),
+  };
+}
+
+/**
  * Update an EB entry
  */
 async function update(id, data) {
@@ -182,6 +213,7 @@ module.exports = {
   findAll,
   findById,
   findByMonthYear,
+  getPreviousClosing,
   update,
   remove,
 };

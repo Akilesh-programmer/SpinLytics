@@ -10,7 +10,15 @@ async function create(data) {
   const kgs = bagToKg(data.bags).toNumber();
   const totalPrice = data.pricePerBag ? parseFloat((data.bags * data.pricePerBag).toFixed(2)) : null;
 
-  // For outflow transactions (ISSUE, DISPATCH), verify sufficient stock
+  // DISPATCH transactions must go through the Dispatch Entry (dispatch.service.js)
+  // which atomically creates both a dispatch record and a stock transaction.
+  if (data.transactionType === 'DISPATCH') {
+    throw ApiError.badRequest(
+      'DISPATCH transactions cannot be created directly. Use the Dispatch Entry instead.'
+    );
+  }
+
+  // For outflow transactions (ISSUE), verify sufficient stock
   if (OUTFLOW_TYPES.includes(data.transactionType)) {
     const currentStock = await getCurrentStockForMaterial(data.materialType);
     if (currentStock < kgs) {

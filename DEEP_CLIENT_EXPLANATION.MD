@@ -208,7 +208,7 @@ When the operator enters numbers, the app instantly shows these calculations (th
 |---|---|---|---|---|---|
 | 1 | **Date** | When the transaction happened | YYYY-MM-DD format | `2026-04-28` | ✅ Yes |
 | 2 | **Material Type** | What material is being moved | One of: `COTTON`, `VISCOSE`, `FIBER`, `EXCEL`, `YARN`, `WASTE` | `COTTON` | ✅ Yes |
-| 3 | **Transaction Type** | What kind of movement | One of: `PURCHASE`, `ISSUE`, `DISPATCH`, `RETURN` | `PURCHASE` | ✅ Yes |
+| 3 | **Transaction Type** | What kind of movement | One of: `PURCHASE`, `ISSUE`, `RETURN` (Dispatch is NOT available here — use the dedicated Dispatch Entry page) | `PURCHASE` | ✅ Yes |
 | 4 | **Lot No** | Which batch/lot this material belongs to | Any text, 1-100 characters | `LOT-2026-042` | ✅ Yes |
 | 5 | **Party Name** | Which supplier or buyer | Any text, 1-200 characters | `ABC Textiles` | ✅ Yes |
 | 6 | **Bags** | How many bags | Positive number (decimals allowed) | `10` | ✅ Yes |
@@ -221,8 +221,9 @@ When the operator enters numbers, the app instantly shows these calculations (th
 |---|---|---|---|
 | **PURCHASE** | Raw material bought from a supplier and received at the factory warehouse | "We bought 10 bags of cotton from ABC Textiles" | Stock **INCREASES** by the entered amount |
 | **ISSUE** | Raw material taken from the warehouse and sent to the production floor for spinning | "We sent 5 bags of cotton from warehouse to the spinning machines" | Stock **DECREASES** by the entered amount |
-| **DISPATCH** | Finished goods (usually yarn) sent out to a buyer/customer | "We shipped 8 bags of yarn to XYZ Mills" | Stock **DECREASES** by the entered amount |
 | **RETURN** | Material returned back to stock (e.g., rejected material returned from production, or returned by buyer) | "3 bags of fiber returned from production floor back to warehouse" | Stock **INCREASES** by the entered amount |
+
+> **Why is DISPATCH not listed here?** Dispatches are handled exclusively through the dedicated **Dispatch Entry** page (Section 3.4). This prevents accidental double-counting and ensures every dispatch is properly tracked with both a dispatch record and an automatic stock reduction.
 
 ### Automatic computations:
 
@@ -243,7 +244,7 @@ Example: 10 bags × ₹5,000 = ₹50,000
 1. **App validates:** Lot No is filled, Party Name is filled, Bags > 0
 2. **Data sent to backend**
 3. **Backend validates** all fields
-4. **For ISSUE or DISPATCH transactions**, the backend performs a **stock sufficiency check**:
+4. **For ISSUE transactions**, the backend performs a **stock sufficiency check**:
    - It calculates the current stock for that material type
    - Current Stock = SUM(all PURCHASE kg) + SUM(all RETURN kg) − SUM(all ISSUE kg) − SUM(all DISPATCH kg)
    - If Current Stock < Requested KG, the transaction is **REJECTED**
@@ -292,6 +293,19 @@ KG = Bags × 60
 ### After successful save:
 - Yarn Type, Bags, Lot No, Remarks are cleared
 - Date and Source are preserved
+
+### Why does "Packing" exist in both Production Entry AND Packing Entry?
+
+These are **intentionally separate** and serve completely different purposes:
+
+| | Production Entry → Packing (kg) | Packing Entry page |
+|---|---|---|
+| **Stored in** | `production_entries` table (as `packingKg`) | `packing_entries` table |
+| **Purpose** | A **production efficiency metric** — how much of this frame's output was packed. Used to calculate **Autocorner Loss %** = (Autocorner − Packing) ÷ Autocorner × 100 | A **detailed packing log** — records which yarn type, which lot, how many bags were packed. Used for inventory tracking and dispatch preparation |
+| **Granularity** | One number per frame per day (e.g., "Frame 41 packed 470 kg today") | Multiple entries per day (e.g., "Packed 5 bags Cotton 40s from LOT-042, then 3 bags Viscose 30s from LOT-043") |
+| **Used in reports?** | ✅ Yes — **ALL loss calculations and dashboard reports use this** | ❌ No — NOT used in any loss calculation or dashboard report |
+
+> **In short:** Production Entry's packing answers "how much was packed?" (a number for loss calculations). Packing Entry answers "what exactly was packed?" (detailed breakdown for inventory).
 
 ---
 
@@ -355,7 +369,7 @@ KG = Bags × 60
 |---|---|---|---|---|---|
 | 1 | **Month** | Which month | 1 (January) through 12 (December) | `4` (April) | ✅ Yes (defaults to current month) |
 | 2 | **Year** | Which year | 2000 through 2100 | `2026` | ✅ Yes (defaults to current year) |
-| 3 | **Opening Units** | Electricity meter reading at the **start** of the month | Number ≥ 0 | `10000` | ✅ Yes |
+| 3 | **Opening Units** | Electricity meter reading at the **start** of the month | Number ≥ 0. **Auto-filled from previous month's closing** (see below). | `10000` | ✅ Yes |
 | 4 | **Closing Units** | Electricity meter reading at the **end** of the month | Number ≥ 0. **Must be ≥ Opening Units** (meter only goes up) | `15000` | ✅ Yes |
 
 ### Available months:
@@ -363,6 +377,20 @@ January, February, March, April, May, June, July, August, September, October, No
 
 ### Available years:
 A range of 10 years: 3 years before the current year to 6 years after. For example, if the current year is 2026, the range is 2023 to 2032.
+
+### Smart Opening Units (Auto-populate):
+
+When you select a month/year, the system automatically checks if the **previous month** has an EB entry:
+
+- **If the previous month has data:** The Opening Units field is **automatically filled** with the previous month's Closing Units, and the field is **locked** (greyed out). A message shows: *"Auto-filled from March 2026 closing (15000)"*. The operator only needs to enter the Closing Units for the current month.
+- **If the previous month has NO data:** The Opening Units field is left **empty** for manual entry. A message shows: *"No EB entry found for March 2026. Enter opening manually."*
+- **Manual override:** Even when auto-filled, the operator can tap *"✏️ Tap to edit opening manually"* to unlock the field and type a different value if needed.
+
+> **Example flow:**
+> - March 2026 EB entry has: Opening = 10,000, Closing = 15,000
+> - When operator opens April 2026 → Opening is auto-filled as **15,000** (March's closing)
+> - Operator only enters Closing for April → say 20,000
+> - EB Consumed for April = 20,000 − 15,000 = **5,000 units**
 
 ### Automatic computation shown live:
 ```

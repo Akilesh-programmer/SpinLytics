@@ -22,7 +22,6 @@ const MATERIAL_OPTIONS = [
 const TXN_OPTIONS = [
   { value: 'PURCHASE', label: 'Purchase (Inflow)' },
   { value: 'ISSUE', label: 'Issue (Outflow)' },
-  { value: 'DISPATCH', label: 'Dispatch (Outflow)' },
   { value: 'RETURN', label: 'Return (Inflow)' },
 ];
 

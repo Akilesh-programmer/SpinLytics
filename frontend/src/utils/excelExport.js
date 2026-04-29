@@ -399,7 +399,7 @@ export function exportMonthlyRealisation(data) {
   rows.push(sectionRow('KEY METRICS', COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
   rows.push([sc('Metric', S.header), sc('Value', S.header), sc('Unit', S.header), sc('Formula', S.header), ...Array(COLS - 4).fill(sc('', S.header))]);
-  rows.push([sc('Yarn Realisation', S.cellBoldLeft), sc(n(data.metrics?.yarnRealisationPercent), S.highlight), sc('%', S.cell), sc('Production / Cotton Issue × 100', S.cellLeft), ...Array(COLS - 4).fill(empty())]);
+  rows.push([sc('Yarn Realisation', S.cellBoldLeft), sc(n(data.metrics?.yarnRealisationPercent), S.highlight), sc('%', S.cell), sc('(Cotton Issue - Production) / Cotton Issue × 100', S.cellLeft), ...Array(COLS - 4).fill(empty())]);
   rows.push([sc('Waste', S.cellBoldLeft), sc(n(data.metrics?.wastePercent), S.highlightAmber), sc('%', S.cell), sc('Waste / Cotton Issue × 100', S.cellLeft), ...Array(COLS - 4).fill(empty())]);
   rows.push([sc('Invisible Loss', S.cellBoldLeft), sc(n(data.metrics?.invisibleLossPercent), n(data.metrics?.invisibleLossPercent) > 3 ? S.warning : S.cell), sc('%', S.cell), sc('100 - Realisation - Waste', S.cellLeft), ...Array(COLS - 4).fill(empty())]);
   rows.push([sc('Total Waste', S.cellBoldLeft), sc(n(data.metrics?.totalWasteKg), S.cell), sc('kg', S.cell), sc('', S.cell), ...Array(COLS - 4).fill(empty())]);
@@ -590,7 +590,7 @@ export function exportYearlySummary(data) {
     rows.push([sc('TOTAL', S.totalRow), sc(yrTotalCI, S.totalRow), sc('100%', S.totalRow), ...Array(COLS - 3).fill(sc('', S.totalRow))]);
 
     rows.push(emptyRow(COLS));
-    rows.push([sc('Yarn Realisation (Year)', S.cellBoldLeft), sc(((yearTotalProd / yrTotalCI) * 100).toFixed(2), S.highlight), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);
+    rows.push([sc('Yarn Realisation (Year)', S.cellBoldLeft), sc((((yrTotalCI - yearTotalProd) / yrTotalCI) * 100).toFixed(2), S.highlight), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);
     const yrWaste = activeMonths.reduce((s, m) => s + n(m.metrics?.totalWasteKg), 0);
     rows.push([sc('Total Waste', S.cellBoldLeft), sc(yrWaste, S.highlightAmber), sc('kg', S.cell), ...Array(COLS - 3).fill(empty())]);
     rows.push([sc('Waste %', S.cellBoldLeft), sc(((yrWaste / yrTotalCI) * 100).toFixed(2), S.cell), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);

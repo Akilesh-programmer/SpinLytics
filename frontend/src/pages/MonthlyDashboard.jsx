@@ -198,7 +198,7 @@ export default function MonthlyDashboard() {
       <div className="monthly-section">
         <h3 className="section-title"><Eye size={18} /> Realisation & Waste Analysis</h3>
         <div className="grid-4">
-          <KPICard label="Yarn Realisation" value={metrics?.yarnRealisationPercent || '0'} unit="%" icon={FlaskConical} color="teal" delay={13} sub="Production / Cotton Issue" />
+          <KPICard label="Yarn Realisation" value={metrics?.yarnRealisationPercent || '0'} unit="%" icon={FlaskConical} color="teal" delay={13} sub="(Cotton Issue - Production) / Cotton Issue" />
           <KPICard label="Waste" value={metrics?.wastePercent || '0'} unit="%" icon={Leaf} color="amber" delay={14} sub={`${totalWaste.toFixed(1)} kg total waste`} />
           <KPICard label="Invisible Loss" value={metrics?.invisibleLossPercent || '0'} unit="%" icon={Eye} color="red" delay={15} sub="100 - Realisation - Waste" />
           <KPICard label="Raw Material Efficiency" value={cottonIssue > 0 ? ((totalProd / cottonIssue) * 100).toFixed(1) : '0'} unit="%" icon={ArrowUp} color="emerald" delay={16} sub="Production / Material Input" />

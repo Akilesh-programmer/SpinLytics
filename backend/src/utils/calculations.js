@@ -112,8 +112,7 @@ function totalCottonIssue(materials) {
 
 /**
  * Yarn Realisation % = (Cotton Issue - Production) / Cotton Issue × 100
- * Note: Higher waste means lower realisation
- * Actually: Realisation = Production / Cotton Issue × 100
+ * Per Requirements.MD: measures the percentage of raw material NOT converted to yarn
  * @param {number|string} cottonIssue
  * @param {number|string} totalProduction
  * @returns {Decimal}
@@ -121,7 +120,7 @@ function totalCottonIssue(materials) {
 function yarnRealisationPercent(cottonIssue, totalProduction) {
   const issue = new Decimal(cottonIssue);
   if (issue.isZero()) return new Decimal(0);
-  return new Decimal(totalProduction).dividedBy(issue).times(100);
+  return issue.minus(totalProduction).dividedBy(issue).times(100);
 }
 
 /**

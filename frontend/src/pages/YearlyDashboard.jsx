@@ -60,7 +60,7 @@ export default function YearlyDashboard() {
 
   // Yearly Realisation/Waste aggregation
   const yearlyWaste = months.reduce((sum, m) => sum + parseFloat(m.metrics?.totalWasteKg || 0), 0);
-  const yearlyRealisationPct = yearlyTotalCottonIssue > 0 ? ((yearlyProd / yearlyTotalCottonIssue) * 100).toFixed(2) : '0';
+  const yearlyRealisationPct = yearlyTotalCottonIssue > 0 ? (((yearlyTotalCottonIssue - yearlyProd) / yearlyTotalCottonIssue) * 100).toFixed(2) : '0';
   const yearlyWastePct = yearlyTotalCottonIssue > 0 ? ((yearlyWaste / yearlyTotalCottonIssue) * 100).toFixed(2) : '0';
   const yearlyInvisibleLossPct = yearlyTotalCottonIssue > 0 ? (100 - parseFloat(yearlyRealisationPct) - parseFloat(yearlyWastePct)).toFixed(2) : '0';
 
@@ -179,7 +179,7 @@ export default function YearlyDashboard() {
           <div className="grid-5">
             <KPICard label="Cotton Issued" value={yearlyCotton.toFixed(0)} unit="kg" icon={Leaf} color="teal" delay={14} />
             <KPICard label="Fiber + Viscose + Excel" value={(yearlyFiber + yearlyViscose + yearlyExcel).toFixed(0)} unit="kg" icon={Leaf} color="blue" delay={15} />
-            <KPICard label="Yarn Realisation" value={yearlyRealisationPct} unit="%" icon={Eye} color="emerald" delay={16} sub="Production / Material Input" />
+            <KPICard label="Yarn Realisation" value={yearlyRealisationPct} unit="%" icon={Eye} color="emerald" delay={16} sub="(Cotton Issue - Production) / Cotton Issue" />
             <KPICard label="Waste" value={yearlyWastePct} unit="%" icon={Leaf} color="amber" delay={17} sub={`${yearlyWaste.toFixed(0)} kg total`} />
             <KPICard label="Invisible Loss" value={yearlyInvisibleLossPct} unit="%" icon={Eye} color="red" delay={18} />
           </div>

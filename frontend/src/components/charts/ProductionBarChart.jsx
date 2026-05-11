@@ -32,8 +32,8 @@ export default function ProductionBarChart({ data, height = 320 }) {
           <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} axisLine={{ stroke: 'var(--border-color)' }} />
           <Tooltip content={<CustomTooltip />} />
           <Legend wrapperStyle={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }} />
-          <Bar dataKey="frame41" name="Frame 41" fill="#00d4aa" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="frame47" name="Frame 47" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="gross" name="Gross Production" fill="#00d4aa" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="net" name="Net Production" fill="#3b82f6" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -1,220 +1,432 @@
 import {
-  CalendarDays, Factory, TrendingDown, Zap, Gauge, BarChart3,
-  Layers, Leaf, FlaskConical, Eye, Package, Scale, ArrowDown,
-  Percent, ArrowUp, Clock,
-} from 'lucide-react';
-import { useApi } from '../hooks/useApi';
-import { useDateNavigation } from '../hooks/useDateNavigation';
-import { dashboardApi } from '../api/dashboard';
-import { productionApi } from '../api/production';
-import KPICard from '../components/common/KPICard';
-import DatePicker from '../components/common/DatePicker';
-import Loader from '../components/common/Loader';
-import ErrorState from '../components/common/ErrorState';
-import EmptyState from '../components/common/EmptyState';
-import ProductionBarChart from '../components/charts/ProductionBarChart';
-import MetricsDonut from '../components/charts/MetricsDonut';
-import TrendLineChart from '../components/charts/TrendLineChart';
-import DataTable from '../components/common/DataTable';
-import ExportButton from '../components/common/ExportButton';
-import { exportMonthlyRealisation, exportMonthlyDaywise } from '../utils/excelExport';
-import './MonthlyDashboard.css';
+  CalendarDays,
+  Factory,
+  TrendingDown,
+  Zap,
+  Gauge,
+  BarChart3,
+  Layers,
+  Leaf,
+  FlaskConical,
+  Eye,
+  Package,
+  Scale,
+  Percent,
+  Clock,
+  Activity,
+} from "lucide-react";
+import { useApi } from "../hooks/useApi";
+import { useDateNavigation } from "../hooks/useDateNavigation";
+import { dashboardApi } from "../api/dashboard";
+import { shiftProductionApi } from "../api/shiftProduction";
+import KPICard from "../components/common/KPICard";
+import DatePicker from "../components/common/DatePicker";
+import Loader from "../components/common/Loader";
+import ErrorState from "../components/common/ErrorState";
+import EmptyState from "../components/common/EmptyState";
+import ProductionBarChart from "../components/charts/ProductionBarChart";
+import MetricsDonut from "../components/charts/MetricsDonut";
+import TrendLineChart from "../components/charts/TrendLineChart";
+import DataTable from "../components/common/DataTable";
+import ExportButton from "../components/common/ExportButton";
+import { exportMonthlyRealisation } from "../utils/excelExport";
+import "./MonthlyDashboard.css";
 
 export default function MonthlyDashboard() {
-  const nav = useDateNavigation('month');
+  const nav = useDateNavigation("month");
   const { data, loading, error, refetch } = useApi(
     () => dashboardApi.getMonthlySummary(nav.year, nav.month),
-    [nav.year, nav.month]
+    [nav.year, nav.month],
   );
 
-  // Fetch daily production for the month's trend chart
-  const startDate = `${nav.year}-${String(nav.month).padStart(2, '0')}-01`;
+  // Fetch daily shift production for trend charts
+  const startDate = `${nav.year}-${String(nav.month).padStart(2, "0")}-01`;
   const lastDay = new Date(nav.year, nav.month, 0).getDate();
-  const endDate = `${nav.year}-${String(nav.month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+  const endDate = `${nav.year}-${String(nav.month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
 
   const { data: prodData } = useApi(
-    () => productionApi.getAll({ startDate, endDate, limit: 100 }),
-    [startDate, endDate]
+    () => shiftProductionApi.getAll({ startDate, endDate, limit: 500 }),
+    [startDate, endDate],
   );
 
-  if (loading) return <div className="page-container"><Loader text="Loading monthly data..." /></div>;
-  if (error) return <div className="page-container"><ErrorState message={error} onRetry={refetch} /></div>;
+  if (loading)
+    return (
+      <div className="page-container">
+        <Loader text="Loading monthly data..." />
+      </div>
+    );
+  if (error)
+    return (
+      <div className="page-container">
+        <ErrorState message={error} onRetry={refetch} />
+      </div>
+    );
 
   const { production, rawMaterials, metrics, energy } = data || {};
 
-  if (!production || Number(production.totalProductionKg) === 0) {
+  if (!production || Number(production.totalGrossKgs) === 0) {
     return (
       <div className="page-container">
         <div className="page-header">
-          <h1 className="page-title"><CalendarDays size={24} /> Monthly Dashboard</h1>
-          <DatePicker label={nav.displayLabel} onPrev={nav.goPrev} onNext={nav.goNext} onToday={nav.goToday} todayLabel="This Month" />
+          <h1 className="page-title">
+            <CalendarDays size={24} /> Monthly Dashboard
+          </h1>
+          <DatePicker
+            label={nav.displayLabel}
+            onPrev={nav.goPrev}
+            onNext={nav.goNext}
+            onToday={nav.goToday}
+            todayLabel="This Month"
+          />
         </div>
-        <EmptyState message="No production data for this month" sub="Try selecting a different month" />
+        <EmptyState
+          message="No production data for this month"
+          sub="Try selecting a different month"
+        />
       </div>
     );
   }
 
-  // Compute additional insight values
-  const totalProd = parseFloat(production.totalProductionKg);
-  const totalAuto = parseFloat(production.totalAutocornerKg);
-  const totalPack = parseFloat(production.totalPackingKg);
+  const totalGross = parseFloat(production.totalGrossKgs);
+  const totalNet = parseFloat(production.totalNetKgs);
+  const totalShiftWaste = parseFloat(production.totalShiftWasteKgs || 0);
   const daysRecorded = production.daysRecorded || 1;
-  const avgDailyProd = totalProd / daysRecorded;
-  const totalSpinLossKg = totalProd - totalAuto;
-  const totalAutoLossKg = totalAuto - totalPack;
-  const overallYield = totalProd > 0 ? ((totalPack / totalProd) * 100).toFixed(1) : '0';
+  const avgDailyProd = totalGross / daysRecorded;
   const cottonIssue = parseFloat(rawMaterials?.totalCottonIssueKg || 0);
-  const totalWaste = parseFloat(metrics?.totalWasteKg || 0);
+  const stockWaste = parseFloat(metrics?.totalStockWasteKg || 0);
+  const countBreakdown = production.countBreakdown || [];
 
-  // Bar chart data
-  const barChartData = [
-    { name: 'Production', frame41: parseFloat(production.frame41Kg), frame47: parseFloat(production.frame47Kg) },
-    { name: 'Autocorner', frame41: totalAuto * (parseFloat(production.frame41Kg) / (totalProd || 1)), frame47: totalAuto * (parseFloat(production.frame47Kg) / (totalProd || 1)) },
-  ];
+  // Bar chart: count-wise production
+  const barChartData = countBreakdown.map((cb) => ({
+    name: cb.count,
+    gross: parseFloat(cb.grossKgs),
+    net: parseFloat(cb.netKgs),
+  }));
 
-  // Daily production trend from prodData — fill ALL days of month for even chart spacing
+  // Daily production trend from shift entries
   const dailyTrend = [];
   if (prodData?.data) {
     const dayMap = {};
     for (const entry of prodData.data) {
       const day = new Date(entry.date).getDate();
-      if (!dayMap[day]) dayMap[day] = { name: `${day}`, production: 0, autocorner: 0, packing: 0, ebUnits: 0, spindles: 0 };
-      dayMap[day].production += parseFloat(entry.productionKg);
-      dayMap[day].autocorner += parseFloat(entry.autocornerProductionKg);
-      dayMap[day].packing += parseFloat(entry.packingKg);
-      dayMap[day].ebUnits += parseFloat(entry.ebUnits);
-      dayMap[day].spindles += entry.noOfSpindles;
+      if (!dayMap[day])
+        dayMap[day] = {
+          name: `${day}`,
+          grossKgs: 0,
+          netKgs: 0,
+          wasteKgs: 0,
+          actualHKSum: 0,
+          stdHKSum: 0,
+        };
+      const gross = parseFloat(
+        entry.calculated?.productionKgsGross ||
+          entry.actualHK * entry.stdConstant ||
+          0,
+      );
+      const waste = parseFloat(entry.wasteKgs || 0);
+      dayMap[day].grossKgs += gross;
+      dayMap[day].netKgs += gross - waste;
+      dayMap[day].wasteKgs += waste;
+      dayMap[day].actualHKSum += parseFloat(entry.actualHK || 0);
+      dayMap[day].stdHKSum += parseFloat(entry.stdHK || 0);
     }
-    // Fill every day from 1 to lastDay so the chart X-axis is uniformly distributed
     for (let d = 1; d <= lastDay; d++) {
-      dailyTrend.push(dayMap[d] || { name: `${d}`, production: 0, autocorner: 0, packing: 0, ebUnits: 0, spindles: 0 });
+      const dm = dayMap[d];
+      if (dm) {
+        dm.avgEfficiency =
+          dm.stdHKSum > 0 ? (dm.actualHKSum / dm.stdHKSum) * 100 : 0;
+      }
+      dailyTrend.push(
+        dm || {
+          name: `${d}`,
+          grossKgs: 0,
+          netKgs: 0,
+          wasteKgs: 0,
+          avgEfficiency: 0,
+        },
+      );
     }
   }
 
-  // Daily data table
+  // Daily table data
   const dailyTableData = dailyTrend.map((d, i) => ({
     id: i,
     day: d.name,
-    production: d.production.toFixed(1),
-    autocorner: d.autocorner.toFixed(1),
-    packing: d.packing.toFixed(1),
-    spinLoss: (d.production - d.autocorner).toFixed(1),
-    spinLossPct: d.production > 0 ? (((d.production - d.autocorner) / d.production) * 100).toFixed(1) : '0',
-    totalLoss: (d.production - d.packing).toFixed(1),
-    ebUnits: d.ebUnits.toFixed(1),
-    ukg: d.production > 0 ? (d.ebUnits / d.production).toFixed(4) : '-',
-    gps: d.spindles > 0 ? (d.production / d.spindles).toFixed(4) : '-',
+    grossKgs: d.grossKgs.toFixed(1),
+    netKgs: d.netKgs.toFixed(1),
+    wasteKgs: d.wasteKgs.toFixed(1),
+    wastePct:
+      d.grossKgs > 0 ? ((d.wasteKgs / d.grossKgs) * 100).toFixed(1) : "0",
+    avgEfficiency: d.avgEfficiency ? d.avgEfficiency.toFixed(1) : "—",
   }));
 
   const dailyTableColumns = [
-    { key: 'day', label: 'Day' },
-    { key: 'production', label: 'Prod (kg)', align: 'right' },
-    { key: 'autocorner', label: 'Auto (kg)', align: 'right' },
-    { key: 'packing', label: 'Pack (kg)', align: 'right' },
-    { key: 'spinLoss', label: 'Spin Loss', align: 'right', render: (v) => <span style={{ color: 'var(--accent-amber)' }}>{v} kg</span> },
-    { key: 'spinLossPct', label: 'Spin %', align: 'right', render: (v) => <span style={{ color: 'var(--accent-amber)' }}>{v}%</span> },
-    { key: 'totalLoss', label: 'Total Loss', align: 'right', render: (v) => <span style={{ color: 'var(--accent-red)' }}>{v} kg</span> },
-    { key: 'ebUnits', label: 'EB Units', align: 'right' },
-    { key: 'ukg', label: 'UKG', align: 'right' },
-    { key: 'gps', label: 'GPS', align: 'right', render: (v) => <span style={{ color: 'var(--accent-emerald)' }}>{v}</span> },
+    { key: "day", label: "Day" },
+    { key: "grossKgs", label: "Gross (kg)", align: "right" },
+    { key: "netKgs", label: "Net (kg)", align: "right" },
+    {
+      key: "wasteKgs",
+      label: "Waste (kg)",
+      align: "right",
+      render: (v) => <span style={{ color: "var(--accent-amber)" }}>{v}</span>,
+    },
+    {
+      key: "wastePct",
+      label: "Waste %",
+      align: "right",
+      render: (v) => <span style={{ color: "var(--accent-amber)" }}>{v}%</span>,
+    },
+    {
+      key: "avgEfficiency",
+      label: "Avg Eff %",
+      align: "right",
+      render: (v) => <span style={{ color: "var(--accent-cyan)" }}>{v}%</span>,
+    },
   ];
 
   return (
     <div className="page-container" id="monthly-dashboard">
       <div className="page-header">
-        <h1 className="page-title"><CalendarDays size={24} /> Monthly Dashboard</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <ExportButton label="Export Monthly" onClick={() => exportMonthlyRealisation(data)} />
-          <ExportButton label="Day-wise Detail" onClick={() => exportMonthlyDaywise(data, prodData?.data)} variant="secondary" />
-          <DatePicker label={nav.displayLabel} onPrev={nav.goPrev} onNext={nav.goNext} onToday={nav.goToday} todayLabel="This Month" />
+        <h1 className="page-title">
+          <CalendarDays size={24} /> Monthly Dashboard
+        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <ExportButton
+            label="Export Monthly"
+            onClick={() => exportMonthlyRealisation(data)}
+          />
+          <DatePicker
+            label={nav.displayLabel}
+            onPrev={nav.goPrev}
+            onNext={nav.goNext}
+            onToday={nav.goToday}
+            todayLabel="This Month"
+          />
         </div>
       </div>
 
       {/* Row 1: Production KPIs */}
       <div className="monthly-section">
-        <h3 className="section-title"><BarChart3 size={18} /> Production Summary</h3>
+        <h3 className="section-title">
+          <BarChart3 size={18} /> Production Summary
+        </h3>
         <div className="grid-5">
-          <KPICard label="Frame 41" value={Number(production.frame41Kg).toFixed(1)} unit="kg" icon={Factory} color="teal" delay={0} sub={`${totalProd > 0 ? ((parseFloat(production.frame41Kg) / totalProd) * 100).toFixed(0) : 0}% of total`} />
-          <KPICard label="Frame 47" value={Number(production.frame47Kg).toFixed(1)} unit="kg" icon={Factory} color="blue" delay={1} sub={`${totalProd > 0 ? ((parseFloat(production.frame47Kg) / totalProd) * 100).toFixed(0) : 0}% of total`} />
-          <KPICard label="Total Production" value={totalProd.toFixed(1)} unit="kg" icon={Factory} color="emerald" delay={2} />
-          <KPICard label="Avg Daily" value={avgDailyProd.toFixed(1)} unit="kg/day" icon={Scale} color="cyan" delay={3} sub={`${daysRecorded} days recorded`} />
-          <KPICard label="Total Packing" value={totalPack.toFixed(1)} unit="kg" icon={Package} color="purple" delay={4} />
+          <KPICard
+            label="Gross Production"
+            value={totalGross.toFixed(1)}
+            unit="kg"
+            icon={Factory}
+            color="teal"
+            delay={0}
+          />
+          <KPICard
+            label="Net Production"
+            value={totalNet.toFixed(1)}
+            unit="kg"
+            icon={Factory}
+            color="emerald"
+            delay={1}
+            sub="Gross − Waste"
+          />
+          <KPICard
+            label="Shift Waste"
+            value={totalShiftWaste.toFixed(1)}
+            unit="kg"
+            icon={TrendingDown}
+            color="amber"
+            delay={2}
+            sub={`${production.shiftWastePercent}%`}
+          />
+          <KPICard
+            label="Avg Efficiency"
+            value={production.avgEfficiency || "0"}
+            unit="%"
+            icon={Gauge}
+            color="cyan"
+            delay={3}
+            sub="Actual HK / STD HK"
+          />
+          <KPICard
+            label="Avg Daily"
+            value={avgDailyProd.toFixed(1)}
+            unit="kg/day"
+            icon={Scale}
+            color="purple"
+            delay={4}
+            sub={`${daysRecorded} days recorded`}
+          />
         </div>
       </div>
 
-      {/* Row 2: Loss & Efficiency KPIs */}
-      <div className="monthly-section">
-        <h3 className="section-title"><TrendingDown size={18} /> Loss Analysis</h3>
-        <div className="grid-5">
-          <KPICard label="Spinning Loss" value={production.spinningLossPercent} unit="%" icon={TrendingDown} color="amber" delay={5} sub={`${totalSpinLossKg.toFixed(1)} kg`} />
-          <KPICard label="Autocorner Loss" value={production.autocornerLossPercent} unit="%" icon={TrendingDown} color="red" delay={6} sub={`${totalAutoLossKg.toFixed(1)} kg`} />
-          <KPICard label="Overall Yield" value={overallYield} unit="%" icon={Percent} color="emerald" delay={7} sub="Packing / Production" />
-          <KPICard label="Total Lost" value={(totalSpinLossKg + totalAutoLossKg).toFixed(1)} unit="kg" icon={ArrowDown} color="red" delay={8} sub="Spinning + Autocorner" />
-          <KPICard label="EB Units" value={Number(energy?.ebUnitsConsumed || 0).toFixed(0)} icon={Zap} color="amber" delay={9} />
+      {/* Count-wise breakdown */}
+      {countBreakdown.length > 0 && (
+        <div className="monthly-section">
+          <h3 className="section-title">
+            <Activity size={18} /> Count-wise Breakdown
+          </h3>
+          <div className="grid-4">
+            {countBreakdown.map((cb, i) => (
+              <KPICard
+                key={cb.count}
+                label={`Count ${cb.count}`}
+                value={Number(cb.grossKgs).toFixed(1)}
+                unit="kg"
+                icon={Factory}
+                color={["teal", "blue", "purple", "cyan"][i % 4]}
+                delay={5 + i}
+                sub={`${cb.percentOfTotal}% of total • Eff: ${cb.avgEfficiency}%`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Row 3: Energy */}
+      {/* Row 2: Energy */}
       <div className="monthly-section">
         <div className="grid-3">
-          <KPICard label="UKG" value={energy?.ukg || '0'} icon={Gauge} color="purple" delay={10} sub="EB Units / Total Production" />
-          <KPICard label="Days Recorded" value={daysRecorded} icon={Clock} color="blue" delay={11} />
-          <KPICard label="Total Autocorner" value={totalAuto.toFixed(1)} unit="kg" icon={Factory} color="teal" delay={12} />
+          <KPICard
+            label="UKG"
+            value={energy?.ukg || "0"}
+            icon={Gauge}
+            color="purple"
+            delay={10}
+            sub="EB Units / Gross Production"
+          />
+          <KPICard
+            label="EB Units"
+            value={Number(energy?.ebUnitsConsumed || 0).toFixed(0)}
+            icon={Zap}
+            color="amber"
+            delay={11}
+          />
+          <KPICard
+            label="Days Recorded"
+            value={daysRecorded}
+            icon={Clock}
+            color="blue"
+            delay={12}
+          />
         </div>
       </div>
 
-      {/* Row 4: Raw Materials Issued */}
+      {/* Row 3: Raw Materials */}
       {rawMaterials && (
         <div className="monthly-section">
-          <h3 className="section-title"><Layers size={18} /> Raw Materials Issued</h3>
+          <h3 className="section-title">
+            <Layers size={18} /> Raw Materials Issued
+          </h3>
           <div className="monthly-raw-grid">
-            <div className="raw-material-card" style={{ animationDelay: '0.1s' }}>
+            <div
+              className="raw-material-card"
+              style={{ animationDelay: "0.1s" }}
+            >
               <div className="raw-material-label">Cotton</div>
-              <div className="raw-material-value">{Number(rawMaterials.cottonIssueKg).toFixed(1)}<span className="raw-material-unit">kg</span></div>
+              <div className="raw-material-value">
+                {Number(rawMaterials.cottonIssueKg).toFixed(1)}
+                <span className="raw-material-unit">kg</span>
+              </div>
             </div>
-            <div className="raw-material-card" style={{ animationDelay: '0.15s' }}>
+            <div
+              className="raw-material-card"
+              style={{ animationDelay: "0.15s" }}
+            >
               <div className="raw-material-label">Fiber</div>
-              <div className="raw-material-value">{Number(rawMaterials.fiberIssueKg).toFixed(1)}<span className="raw-material-unit">kg</span></div>
+              <div className="raw-material-value">
+                {Number(rawMaterials.fiberIssueKg).toFixed(1)}
+                <span className="raw-material-unit">kg</span>
+              </div>
             </div>
-            <div className="raw-material-card" style={{ animationDelay: '0.2s' }}>
+            <div
+              className="raw-material-card"
+              style={{ animationDelay: "0.2s" }}
+            >
               <div className="raw-material-label">Viscose</div>
-              <div className="raw-material-value">{Number(rawMaterials.viscoseIssueKg).toFixed(1)}<span className="raw-material-unit">kg</span></div>
+              <div className="raw-material-value">
+                {Number(rawMaterials.viscoseIssueKg).toFixed(1)}
+                <span className="raw-material-unit">kg</span>
+              </div>
             </div>
-            <div className="raw-material-card" style={{ animationDelay: '0.25s' }}>
+            <div
+              className="raw-material-card"
+              style={{ animationDelay: "0.25s" }}
+            >
               <div className="raw-material-label">Excel</div>
-              <div className="raw-material-value">{Number(rawMaterials.excelIssueKg).toFixed(1)}<span className="raw-material-unit">kg</span></div>
+              <div className="raw-material-value">
+                {Number(rawMaterials.excelIssueKg).toFixed(1)}
+                <span className="raw-material-unit">kg</span>
+              </div>
             </div>
-            <div className="raw-material-card" style={{ animationDelay: '0.3s', borderColor: 'var(--accent-teal)', borderWidth: '1px' }}>
+            <div
+              className="raw-material-card"
+              style={{
+                animationDelay: "0.3s",
+                borderColor: "var(--accent-teal)",
+                borderWidth: "1px",
+              }}
+            >
               <div className="raw-material-label">Total Cotton Issue</div>
-              <div className="raw-material-value" style={{ color: 'var(--accent-teal)' }}>
-                {cottonIssue.toFixed(1)}<span className="raw-material-unit">kg</span>
+              <div
+                className="raw-material-value"
+                style={{ color: "var(--accent-teal)" }}
+              >
+                {cottonIssue.toFixed(1)}
+                <span className="raw-material-unit">kg</span>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Row 5: Realisation Metrics */}
+      {/* Row 4: Realisation & Waste */}
       <div className="monthly-section">
-        <h3 className="section-title"><Eye size={18} /> Realisation & Waste Analysis</h3>
-        <div className="grid-4">
-          <KPICard label="Yarn Realisation" value={metrics?.yarnRealisationPercent || '0'} unit="%" icon={FlaskConical} color="teal" delay={13} sub="(Cotton Issue - Production) / Cotton Issue" />
-          <KPICard label="Waste" value={metrics?.wastePercent || '0'} unit="%" icon={Leaf} color="amber" delay={14} sub={`${totalWaste.toFixed(1)} kg total waste`} />
-          <KPICard label="Invisible Loss" value={metrics?.invisibleLossPercent || '0'} unit="%" icon={Eye} color="red" delay={15} sub="100 - Realisation - Waste" />
-          <KPICard label="Raw Material Efficiency" value={cottonIssue > 0 ? ((totalProd / cottonIssue) * 100).toFixed(1) : '0'} unit="%" icon={ArrowUp} color="emerald" delay={16} sub="Production / Material Input" />
+        <h3 className="section-title">
+          <Eye size={18} /> Realisation & Waste Analysis
+        </h3>
+        <div className="grid-3">
+          <KPICard
+            label="Yarn Realisation"
+            value={metrics?.yarnRealisationPercent || "0"}
+            unit="%"
+            icon={FlaskConical}
+            color="teal"
+            delay={13}
+            sub="Gross Production / Cotton Issue"
+          />
+          <KPICard
+            label="Waste"
+            value={metrics?.wastePercent || "0"}
+            unit="%"
+            icon={Leaf}
+            color="amber"
+            delay={14}
+            sub={`${stockWaste.toFixed(1)} kg stock waste`}
+          />
+          <KPICard
+            label="Invisible Loss"
+            value={metrics?.invisibleLossPercent || "0"}
+            unit="%"
+            icon={Eye}
+            color="red"
+            delay={15}
+            sub="100 − Realisation − Waste"
+          />
         </div>
       </div>
 
-      {/* Charts: Bar + Donut */}
+      {/* Charts */}
       <div className="monthly-section">
         <div className="monthly-charts">
           <div>
-            <h3 className="section-title"><BarChart3 size={18} /> Production by Frame</h3>
+            <h3 className="section-title">
+              <BarChart3 size={18} /> Production by Count
+            </h3>
             <ProductionBarChart data={barChartData} height={280} />
           </div>
           {metrics && (
             <div>
-              <h3 className="section-title"><Eye size={18} /> Realisation Breakdown</h3>
+              <h3 className="section-title">
+                <Eye size={18} /> Realisation Breakdown
+              </h3>
               <MetricsDonut
                 realisation={metrics.yarnRealisationPercent}
                 waste={metrics.wastePercent}
@@ -226,63 +438,35 @@ export default function MonthlyDashboard() {
         </div>
       </div>
 
-      {/* Best / Worst Day */}
+      {/* Daily Production Trend */}
       {dailyTrend.length > 1 && (
         <div className="monthly-section">
-          <h3 className="section-title"><Scale size={18} /> Day Performance</h3>
-          {(() => {
-            const sorted = [...dailyTrend].sort((a, b) => b.production - a.production);
-            const best = sorted[0];
-            const worst = sorted[sorted.length - 1];
-            const maxEB = [...dailyTrend].sort((a, b) => b.ebUnits - a.ebUnits)[0];
-            const bestUKGDay = [...dailyTrend].filter(d => d.production > 0).sort((a, b) => (a.ebUnits / a.production) - (b.ebUnits / b.production))[0];
-            return (
-              <div className="grid-4">
-                <KPICard label="Best Day (Prod)" value={best.name} icon={ArrowUp} color="emerald" sub={`${best.production.toFixed(0)} kg`} />
-                <KPICard label="Lowest Day (Prod)" value={worst.name} icon={ArrowDown} color="amber" sub={`${worst.production.toFixed(0)} kg`} />
-                <KPICard label="Highest EB Day" value={maxEB.name} icon={Zap} color="red" sub={`${maxEB.ebUnits.toFixed(0)} units`} />
-                {bestUKGDay && <KPICard label="Best UKG Day" value={bestUKGDay.name} icon={Gauge} color="cyan" sub={`UKG: ${(bestUKGDay.ebUnits / bestUKGDay.production).toFixed(4)}`} />}
-              </div>
-            );
-          })()}
-        </div>
-      )}
-
-      {/* Daily Production Trend Line Chart */}
-      {dailyTrend.length > 1 && (
-        <div className="monthly-section">
-          <h3 className="section-title"><BarChart3 size={18} /> Daily Production Trend</h3>
+          <h3 className="section-title">
+            <BarChart3 size={18} /> Daily Production Trend
+          </h3>
           <TrendLineChart
             data={dailyTrend}
             lines={[
-              { key: 'production', name: 'Production', color: '#00d4aa' },
-              { key: 'autocorner', name: 'Autocorner', color: '#8b5cf6' },
-              { key: 'packing', name: 'Packing', color: '#3b82f6' },
+              { key: "grossKgs", name: "Gross Production", color: "#00d4aa" },
+              { key: "netKgs", name: "Net Production", color: "#3b82f6" },
+              { key: "wasteKgs", name: "Waste", color: "#f59e0b" },
             ]}
             height={300}
           />
         </div>
       )}
 
-      {/* Daily EB Units Trend */}
-      {dailyTrend.length > 1 && (
-        <div className="monthly-section">
-          <h3 className="section-title"><Zap size={18} /> Daily EB Consumption</h3>
-          <TrendLineChart
-            data={dailyTrend}
-            lines={[
-              { key: 'ebUnits', name: 'EB Units', color: '#f59e0b' },
-            ]}
-            height={250}
-          />
-        </div>
-      )}
-
-      {/* Daily Breakdown Table */}
+      {/* Day-by-Day Table */}
       {dailyTableData.length > 0 && (
         <div className="monthly-section">
-          <h3 className="section-title"><CalendarDays size={18} /> Day-by-Day Breakdown</h3>
-          <DataTable columns={dailyTableColumns} data={dailyTableData} emptyMessage="No daily data" />
+          <h3 className="section-title">
+            <CalendarDays size={18} /> Day-by-Day Breakdown
+          </h3>
+          <DataTable
+            columns={dailyTableColumns}
+            data={dailyTableData}
+            emptyMessage="No daily data"
+          />
         </div>
       )}
     </div>

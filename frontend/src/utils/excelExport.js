@@ -1,31 +1,31 @@
-import XLSX from 'xlsx-js-style';
-import { saveAs } from 'file-saver';
+import XLSX from "xlsx-js-style";
+import { saveAs } from "file-saver";
 
 // ─── Color Palette ─────────────────────────────────────────
 const C = {
-  teal:     '00D4AA',
-  tealDark: '0A1A2F',
-  navy:     '0F2A3F',
-  blue:     '3B82F6',
-  purple:   '8B5CF6',
-  amber:    'F59E0B',
-  red:      'EF4444',
-  green:    '10B981',
-  cyan:     '06B6D4',
-  white:    'FFFFFF',
-  light:    'F1F5F9',
-  gray:     'E2E8F0',
-  darkGray: '64748B',
-  lightTeal:'CCFBF1',
-  lightRed: 'FEF2F2',
-  lightAmber:'FEF3C7',
-  lightBlue:'DBEAFE',
-  lightPurple:'EDE9FE',
+  teal: "00D4AA",
+  tealDark: "0A1A2F",
+  navy: "0F2A3F",
+  blue: "3B82F6",
+  purple: "8B5CF6",
+  amber: "F59E0B",
+  red: "EF4444",
+  green: "10B981",
+  cyan: "06B6D4",
+  white: "FFFFFF",
+  light: "F1F5F9",
+  gray: "E2E8F0",
+  darkGray: "64748B",
+  lightTeal: "CCFBF1",
+  lightRed: "FEF2F2",
+  lightAmber: "FEF3C7",
+  lightBlue: "DBEAFE",
+  lightPurple: "EDE9FE",
 };
 
 // ─── Style Presets ──────────────────────────────────────────
 function borderAll(color) {
-  const b = { style: 'thin', color: { rgb: color || C.gray } };
+  const b = { style: "thin", color: { rgb: color || C.gray } };
   return { top: b, bottom: b, left: b, right: b };
 }
 
@@ -33,138 +33,149 @@ const S = {
   title: {
     font: { bold: true, sz: 16, color: { rgb: C.white } },
     fill: { fgColor: { rgb: C.tealDark } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.tealDark),
   },
   subtitle: {
     font: { bold: true, sz: 12, color: { rgb: C.white } },
     fill: { fgColor: { rgb: C.navy } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.navy),
   },
   header: {
     font: { bold: true, sz: 11, color: { rgb: C.white } },
     fill: { fgColor: { rgb: C.teal } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.teal),
   },
   headerBlue: {
     font: { bold: true, sz: 11, color: { rgb: C.white } },
     fill: { fgColor: { rgb: C.blue } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.blue),
   },
   headerPurple: {
     font: { bold: true, sz: 11, color: { rgb: C.white } },
     fill: { fgColor: { rgb: C.purple } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.purple),
   },
   headerAmber: {
     font: { bold: true, sz: 11, color: { rgb: C.white } },
     fill: { fgColor: { rgb: C.amber } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.amber),
   },
   headerRed: {
     font: { bold: true, sz: 11, color: { rgb: C.white } },
     fill: { fgColor: { rgb: C.red } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.red),
   },
   sectionHeader: {
     font: { bold: true, sz: 12, color: { rgb: C.tealDark } },
     fill: { fgColor: { rgb: C.light } },
-    alignment: { horizontal: 'left', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "left", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   cell: {
     font: { sz: 10 },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   cellLeft: {
     font: { sz: 10 },
-    alignment: { horizontal: 'left', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "left", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   cellBold: {
     font: { bold: true, sz: 10 },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   cellBoldLeft: {
     font: { bold: true, sz: 10 },
-    alignment: { horizontal: 'left', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "left", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   totalRow: {
     font: { bold: true, sz: 11, color: { rgb: C.white } },
     fill: { fgColor: { rgb: C.navy } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.navy),
   },
   highlight: {
     font: { bold: true, sz: 10, color: { rgb: C.tealDark } },
     fill: { fgColor: { rgb: C.lightTeal } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   highlightBlue: {
-    font: { bold: true, sz: 10, color: { rgb: '1E40AF' } },
+    font: { bold: true, sz: 10, color: { rgb: "1E40AF" } },
     fill: { fgColor: { rgb: C.lightBlue } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   highlightPurple: {
-    font: { bold: true, sz: 10, color: { rgb: '6D28D9' } },
+    font: { bold: true, sz: 10, color: { rgb: "6D28D9" } },
     fill: { fgColor: { rgb: C.lightPurple } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   highlightAmber: {
-    font: { bold: true, sz: 10, color: { rgb: '92400E' } },
+    font: { bold: true, sz: 10, color: { rgb: "92400E" } },
     fill: { fgColor: { rgb: C.lightAmber } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   warning: {
     font: { bold: true, sz: 10, color: { rgb: C.red } },
     fill: { fgColor: { rgb: C.lightRed } },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
   },
   percent: {
     font: { sz: 10 },
-    alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
     border: borderAll(C.gray),
     numFmt: '0.00"%"',
   },
 };
 
 // ─── Helpers ────────────────────────────────────────────────
-function n(v) { return v != null && v !== '' && v !== '—' ? Number(v) : 0; }
+function n(v) {
+  return v != null && v !== "" && v !== "—" ? Number(v) : 0;
+}
 
-function createWorkbook() { return XLSX.utils.book_new(); }
+function createWorkbook() {
+  return XLSX.utils.book_new();
+}
 
 function addSheet(wb, data, name, colWidths, merges) {
   const ws = XLSX.utils.aoa_to_sheet([]);
-  const maxCols = Math.max(...data.map(r => r.length));
+  const maxCols = Math.max(...data.map((r) => r.length));
 
   // Set cell values and styles
   data.forEach((row, ri) => {
     row.forEach((cell, ci) => {
       const addr = XLSX.utils.encode_cell({ r: ri, c: ci });
-      if (cell && typeof cell === 'object' && cell.v !== undefined) {
-        ws[addr] = { v: cell.v, t: cell.t || (typeof cell.v === 'number' ? 'n' : 's'), s: cell.s };
+      if (cell && typeof cell === "object" && cell.v !== undefined) {
+        ws[addr] = {
+          v: cell.v,
+          t: cell.t || (typeof cell.v === "number" ? "n" : "s"),
+          s: cell.s,
+        };
       } else if (cell !== undefined && cell !== null) {
-        ws[addr] = { v: cell, t: typeof cell === 'number' ? 'n' : 's' };
+        ws[addr] = { v: cell, t: typeof cell === "number" ? "n" : "s" };
       }
     });
   });
 
   // Set sheet range
-  ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: data.length - 1, c: maxCols - 1 } });
+  ws["!ref"] = XLSX.utils.encode_range({
+    s: { r: 0, c: 0 },
+    e: { r: data.length - 1, c: maxCols - 1 },
+  });
 
   // Auto-calculate column widths: use provided widths as minimums, expand if content is larger
   const autoWidths = Array(maxCols).fill(8);
@@ -173,8 +184,11 @@ function addSheet(wb, data, name, colWidths, merges) {
       if (ci >= maxCols) return;
       // Skip merged title/subtitle rows for width calculation
       if (ri <= 1) return;
-      const val = (cell && typeof cell === 'object' && cell.v !== undefined) ? cell.v : cell;
-      if (val !== undefined && val !== null && val !== '') {
+      const val =
+        cell && typeof cell === "object" && cell.v !== undefined
+          ? cell.v
+          : cell;
+      if (val !== undefined && val !== null && val !== "") {
         const len = String(val).length;
         autoWidths[ci] = Math.max(autoWidths[ci], Math.min(len + 4, 50));
       }
@@ -185,17 +199,20 @@ function addSheet(wb, data, name, colWidths, merges) {
     const provided = colWidths && colWidths[i] ? colWidths[i] : 10;
     return Math.max(provided, aw);
   });
-  ws['!cols'] = finalWidths.map(w => ({ wch: w }));
+  ws["!cols"] = finalWidths.map((w) => ({ wch: w }));
 
   // Row heights: title=30, subtitle=22, data rows auto-expand based on content
-  ws['!rows'] = data.map((row, i) => {
+  ws["!rows"] = data.map((row, i) => {
     if (i === 0) return { hpt: 30 };
     if (i === 1) return { hpt: 22 };
     // Check if any cell in this row has long text that would wrap
     let maxLines = 1;
     row.forEach((cell, ci) => {
-      const val = (cell && typeof cell === 'object' && cell.v !== undefined) ? cell.v : cell;
-      if (val && typeof val === 'string') {
+      const val =
+        cell && typeof cell === "object" && cell.v !== undefined
+          ? cell.v
+          : cell;
+      if (val && typeof val === "string") {
         const colW = finalWidths[ci] || 14;
         const lines = Math.ceil(val.length / colW);
         maxLines = Math.max(maxLines, lines);
@@ -205,133 +222,210 @@ function addSheet(wb, data, name, colWidths, merges) {
   });
 
   // Merges
-  if (merges) ws['!merges'] = merges;
+  if (merges) ws["!merges"] = merges;
 
   XLSX.utils.book_append_sheet(wb, ws, name.substring(0, 31));
   return ws;
 }
 
-function sc(value, style) { return { v: value, s: style, t: typeof value === 'number' ? 'n' : 's' }; }
-function empty() { return sc('', S.cell); }
+function sc(value, style) {
+  return { v: value, s: style, t: typeof value === "number" ? "n" : "s" };
+}
+function empty() {
+  return sc("", S.cell);
+}
 
 // Merge range helper: { s: { r, c }, e: { r, c } }
-function merge(r1, c1, r2, c2) { return { s: { r: r1, c: c1 }, e: { r: r2, c: c2 } }; }
+function merge(r1, c1, r2, c2) {
+  return { s: { r: r1, c: c1 }, e: { r: r2, c: c2 } };
+}
 
 function download(wb, filename) {
-  const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  saveAs(new Blob([buf], { type: 'application/octet-stream' }), filename);
+  const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  saveAs(new Blob([buf], { type: "application/octet-stream" }), filename);
 }
 
 // Title row with merge across all columns
 function titleRow(text, colCount, style) {
-  return [sc(text, style || S.title), ...Array(colCount - 1).fill(sc('', style || S.title))];
+  return [
+    sc(text, style || S.title),
+    ...Array(colCount - 1).fill(sc("", style || S.title)),
+  ];
 }
 function subtitleRow(text, colCount) {
-  return [sc(text, S.subtitle), ...Array(colCount - 1).fill(sc('', S.subtitle))];
+  return [
+    sc(text, S.subtitle),
+    ...Array(colCount - 1).fill(sc("", S.subtitle)),
+  ];
 }
 function sectionRow(text, colCount) {
-  return [sc(text, S.sectionHeader), ...Array(colCount - 1).fill(sc('', S.sectionHeader))];
+  return [
+    sc(text, S.sectionHeader),
+    ...Array(colCount - 1).fill(sc("", S.sectionHeader)),
+  ];
 }
-function emptyRow(colCount) { return Array(colCount).fill(empty()); }
+function emptyRow(colCount) {
+  return Array(colCount).fill(empty());
+}
 
 // ─────────────────────────────────────────────────────────────
 // REPORT 1: Daily Production Report (Enhanced)
 // ─────────────────────────────────────────────────────────────
 export function exportDailyProduction(data, dateStr) {
   const wb = createWorkbook();
-  const { frames = [], totals } = data || {};
-  const COLS = 11;
+  const { entries = [], countSummaries = [], totals } = data || {};
+  const COLS = 12;
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
 
-  rows.push(titleRow('SPINLYTICS — DAILY PRODUCTION REPORT', COLS));
+  rows.push(titleRow("SPINLYTICS — DAILY PRODUCTION REPORT (2026)", COLS));
   rows.push(subtitleRow(`Date: ${dateStr}`, COLS));
   rows.push(emptyRow(COLS));
 
-  // Production Data
-  rows.push(sectionRow('PRODUCTION DATA', COLS));
+  // Shift Entries Detail
+  rows.push(sectionRow("SHIFT PRODUCTION ENTRIES", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
 
   rows.push([
-    sc('Frame', S.header), sc('Production (kg)', S.header), sc('Autocorner (kg)', S.header),
-    sc('Packing (kg)', S.header), sc('EB Units', S.header), sc('Spindles', S.header),
-    sc('Spinning Loss (kg)', S.headerBlue), sc('Spinning Loss %', S.headerBlue),
-    sc('Autocorner Loss (kg)', S.headerPurple), sc('Autocorner Loss %', S.headerPurple),
-    sc('Remarks', S.header),
+    sc("R/F No.", S.header),
+    sc("Sider", S.header),
+    sc("Count", S.header),
+    sc("Actual HK", S.header),
+    sc("Gross Kg", S.header),
+    sc("Net Kg", S.header),
+    sc("Waste Kg", S.headerAmber),
+    sc("Waste %", S.headerAmber),
+    sc("Efficiency %", S.headerBlue),
+    sc("Wkd Spindles", S.header),
+    sc("G/Spindle", S.headerPurple),
+    sc("Stoppages", S.header),
   ]);
 
-  frames.forEach(fr => {
-    const c = fr.calculated || {};
-    const prod = n(fr.productionKg);
-    const auto = n(fr.autocornerProductionKg);
-    const pack = n(fr.packingKg);
-    const spinLossKg = prod - auto;
-    const autoLossKg = auto - pack;
+  entries.forEach((e) => {
+    const c = e.calculated || {};
+    const wastePct = n(c.wastePercent);
+    const effPct = n(c.efficiencyPercent);
     rows.push([
-      sc(fr.frameNumber === 'FRAME_41' ? 'Frame 41' : 'Frame 47', S.cellBoldLeft),
-      sc(prod, S.cell), sc(auto, S.cell), sc(pack, S.cell),
-      sc(n(fr.ebUnits), S.cell), sc(fr.noOfSpindles, S.cell),
-      sc(spinLossKg, S.cell), sc(n(c.spinningLossPercent), n(c.spinningLossPercent) > 5 ? S.warning : S.cell),
-      sc(autoLossKg, S.cell), sc(n(c.autocornerLossPercent), n(c.autocornerLossPercent) > 5 ? S.warning : S.cell),
-      sc(fr.remarks || '—', S.cellLeft),
+      sc(e.rfNo, S.cellBold),
+      sc(e.siderName, S.cellLeft),
+      sc(e.count, S.highlight),
+      sc(n(e.actualHK), S.cell),
+      sc(n(c.productionKgsGross), S.cell),
+      sc(n(c.actualProductionKgs), S.cell),
+      sc(n(e.wasteKgs), S.cell),
+      sc(wastePct, wastePct > 5 ? S.warning : S.cell),
+      sc(effPct, effPct < 80 ? S.warning : S.highlight),
+      sc(n(c.workedSpindles), S.cell),
+      sc(n(c.gramsPerSpindle), S.highlightPurple),
+      sc(e.stoppages || "—", S.cellLeft),
     ]);
   });
 
-  // Totals row
+  // Grand Totals
   if (totals) {
     rows.push([
-      sc('TOTAL', S.totalRow), sc(n(totals.totalProductionKg), S.totalRow),
-      sc(n(totals.totalAutocornerKg), S.totalRow), sc(n(totals.totalPackingKg), S.totalRow),
-      sc(n(totals.totalEBUnits), S.totalRow), sc(totals.totalSpindles, S.totalRow),
-      sc(n(totals.totalProductionKg) - n(totals.totalAutocornerKg), S.totalRow),
-      sc(n(totals.spinningLossPercent), S.totalRow),
-      sc(n(totals.totalAutocornerKg) - n(totals.totalPackingKg), S.totalRow),
-      sc(n(totals.autocornerLossPercent), S.totalRow),
-      sc('', S.totalRow),
+      sc("TOTAL", S.totalRow),
+      sc(`${totals.entryCount} entries`, S.totalRow),
+      sc("", S.totalRow),
+      sc("", S.totalRow),
+      sc(n(totals.totalGrossKgs), S.totalRow),
+      sc(n(totals.totalNetKgs), S.totalRow),
+      sc(n(totals.totalWasteKgs), S.totalRow),
+      sc(`${totals.wastePercent}%`, S.totalRow),
+      sc(`${totals.avgEfficiency}%`, S.totalRow),
+      ...Array(COLS - 9).fill(sc("", S.totalRow)),
     ]);
   }
 
   rows.push(emptyRow(COLS));
 
-  // Key Metrics Section
-  rows.push(sectionRow('KEY PERFORMANCE METRICS', COLS));
-  merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-
-  if (totals) {
-    rows.push([sc('Metric', S.headerAmber), sc('Value', S.headerAmber), sc('Unit', S.headerAmber), sc('Status', S.headerAmber), ...Array(COLS - 4).fill(sc('', S.headerAmber))]);
-    rows.push([sc('UKG (Energy/kg)', S.cellBoldLeft), sc(n(totals.ukg), S.highlight), sc('units/kg', S.cell), sc(n(totals.ukg) < 3 ? '✓ Efficient' : '⚠ Review', n(totals.ukg) < 3 ? S.highlight : S.highlightAmber), ...Array(COLS - 4).fill(empty())]);
-    rows.push([sc('GPS (Gram/Spindle)', S.cellBoldLeft), sc(n(totals.gps), S.highlightBlue), sc('g/spindle', S.cell), sc('—', S.cell), ...Array(COLS - 4).fill(empty())]);
-    rows.push([sc('Spinning Loss %', S.cellBoldLeft), sc(n(totals.spinningLossPercent), n(totals.spinningLossPercent) > 5 ? S.warning : S.highlight), sc('%', S.cell), sc(n(totals.spinningLossPercent) > 5 ? '⚠ HIGH' : '✓ Normal', n(totals.spinningLossPercent) > 5 ? S.warning : S.highlight), ...Array(COLS - 4).fill(empty())]);
-    rows.push([sc('Autocorner Loss %', S.cellBoldLeft), sc(n(totals.autocornerLossPercent), n(totals.autocornerLossPercent) > 5 ? S.warning : S.highlight), sc('%', S.cell), sc(n(totals.autocornerLossPercent) > 5 ? '⚠ HIGH' : '✓ Normal', n(totals.autocornerLossPercent) > 5 ? S.warning : S.highlight), ...Array(COLS - 4).fill(empty())]);
-    rows.push([sc('Overall Yield', S.cellBoldLeft), sc(n(totals.totalPackingKg) > 0 ? ((n(totals.totalPackingKg) / n(totals.totalProductionKg)) * 100).toFixed(2) : 0, S.highlightPurple), sc('%', S.cell), sc('Packing/Production', S.cell), ...Array(COLS - 4).fill(empty())]);
-    const totalLossKg = n(totals.totalProductionKg) - n(totals.totalPackingKg);
-    rows.push([sc('Total Material Lost', S.cellBoldLeft), sc(totalLossKg, S.warning), sc('kg', S.cell), sc('Production - Packing', S.cell), ...Array(COLS - 4).fill(empty())]);
-    rows.push([sc('Avg Production/Frame', S.cellBoldLeft), sc(frames.length > 0 ? (n(totals.totalProductionKg) / frames.length).toFixed(2) : 0, S.cell), sc('kg', S.cell), sc(`${frames.length} frames`, S.cell), ...Array(COLS - 4).fill(empty())]);
-  }
-
-  rows.push(emptyRow(COLS));
-
-  // Frame Comparison Section (if both frames exist)
-  if (frames.length === 2) {
-    rows.push(sectionRow('FRAME-WISE COMPARISON', COLS));
+  // Count-wise Summary
+  if (countSummaries.length > 0) {
+    rows.push(sectionRow("COUNT-WISE SUMMARY", COLS));
     merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-    rows.push([sc('Metric', S.headerPurple), sc('Frame 41', S.headerPurple), sc('Frame 47', S.headerPurple), sc('Better Frame', S.headerPurple), ...Array(COLS - 4).fill(sc('', S.headerPurple))]);
-    const f41 = frames.find(f => f.frameNumber === 'FRAME_41');
-    const f47 = frames.find(f => f.frameNumber === 'FRAME_47');
-    if (f41 && f47) {
-      const c41 = f41.calculated || {}; const c47 = f47.calculated || {};
-      rows.push([sc('Production (kg)', S.cellBoldLeft), sc(n(f41.productionKg), S.cell), sc(n(f47.productionKg), S.cell), sc(n(f41.productionKg) >= n(f47.productionKg) ? 'Frame 41' : 'Frame 47', S.highlight), ...Array(COLS - 4).fill(empty())]);
-      rows.push([sc('Spinning Loss %', S.cellBoldLeft), sc(n(c41.spinningLossPercent), n(c41.spinningLossPercent) > 5 ? S.warning : S.cell), sc(n(c47.spinningLossPercent), n(c47.spinningLossPercent) > 5 ? S.warning : S.cell), sc(n(c41.spinningLossPercent) <= n(c47.spinningLossPercent) ? 'Frame 41' : 'Frame 47', S.highlight), ...Array(COLS - 4).fill(empty())]);
-      rows.push([sc('UKG', S.cellBoldLeft), sc(n(c41.ukg), S.cell), sc(n(c47.ukg), S.cell), sc(n(c41.ukg) <= n(c47.ukg) ? 'Frame 41' : 'Frame 47', S.highlight), ...Array(COLS - 4).fill(empty())]);
-      rows.push([sc('GPS', S.cellBoldLeft), sc(n(c41.gps), S.cell), sc(n(c47.gps), S.cell), sc(n(c41.gps) >= n(c47.gps) ? 'Frame 41' : 'Frame 47', S.highlight), ...Array(COLS - 4).fill(empty())]);
-    }
+    rows.push([
+      sc("Count", S.header),
+      sc("Entries", S.header),
+      sc("Gross Kg", S.header),
+      sc("Net Kg", S.header),
+      sc("Waste Kg", S.headerAmber),
+      sc("Waste %", S.headerAmber),
+      sc("Avg Eff %", S.headerBlue),
+      ...Array(COLS - 7).fill(sc("", S.header)),
+    ]);
+    countSummaries.forEach((cs) => {
+      rows.push([
+        sc(cs.count, S.cellBold),
+        sc(cs.entryCount, S.cell),
+        sc(n(cs.totalGrossKgs), S.cell),
+        sc(n(cs.totalNetKgs), S.cell),
+        sc(n(cs.totalWasteKgs), S.cell),
+        sc(`${cs.wastePercent}%`, S.cell),
+        sc(`${cs.avgEfficiency}%`, S.highlight),
+        ...Array(COLS - 7).fill(empty()),
+      ]);
+    });
     rows.push(emptyRow(COLS));
   }
 
-  rows.push(sectionRow(`Report generated: ${new Date().toLocaleString('en-IN')}`, COLS));
+  // Key Metrics
+  if (totals) {
+    rows.push(sectionRow("KEY PERFORMANCE METRICS", COLS));
+    merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
+    rows.push([
+      sc("Metric", S.headerAmber),
+      sc("Value", S.headerAmber),
+      sc("Unit", S.headerAmber),
+      sc("Status", S.headerAmber),
+      ...Array(COLS - 4).fill(sc("", S.headerAmber)),
+    ]);
+    rows.push([
+      sc("Gross Production", S.cellBoldLeft),
+      sc(n(totals.totalGrossKgs), S.highlight),
+      sc("kg", S.cell),
+      sc("ActualHK × STDConst", S.cellLeft),
+      ...Array(COLS - 4).fill(empty()),
+    ]);
+    rows.push([
+      sc("Net Production", S.cellBoldLeft),
+      sc(n(totals.totalNetKgs), S.highlight),
+      sc("kg", S.cell),
+      sc("Gross − Waste", S.cellLeft),
+      ...Array(COLS - 4).fill(empty()),
+    ]);
+    rows.push([
+      sc("Total Waste", S.cellBoldLeft),
+      sc(n(totals.totalWasteKgs), S.highlightAmber),
+      sc("kg", S.cell),
+      sc(`${totals.wastePercent}%`, S.cell),
+      ...Array(COLS - 4).fill(empty()),
+    ]);
+    const eff = n(totals.avgEfficiency);
+    rows.push([
+      sc("Avg Efficiency", S.cellBoldLeft),
+      sc(eff, eff < 80 ? S.warning : S.highlight),
+      sc("%", S.cell),
+      sc(
+        eff < 80 ? "⚠ Below Target" : "✓ On Target",
+        eff < 80 ? S.warning : S.highlight,
+      ),
+      ...Array(COLS - 4).fill(empty()),
+    ]);
+  }
+
+  rows.push(emptyRow(COLS));
+  rows.push(
+    sectionRow(`Report generated: ${new Date().toLocaleString("en-IN")}`, COLS),
+  );
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
 
-  addSheet(wb, rows, 'Daily Production', [14, 16, 16, 14, 12, 10, 16, 14, 18, 16, 28], merges);
+  addSheet(
+    wb,
+    rows,
+    "Daily Production",
+    [10, 16, 10, 12, 12, 12, 12, 10, 12, 14, 12, 28],
+    merges,
+  );
   download(wb, `SpinLytics_Daily_Production_${dateStr}.xlsx`);
 }
 
@@ -343,80 +437,217 @@ export function exportMonthlyRealisation(data) {
   const COLS = 7;
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
-  const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const MONTHS = [
+    "",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
-  rows.push(titleRow('SPINLYTICS — MONTHLY REALISATION REPORT', COLS));
+  rows.push(titleRow("SPINLYTICS — MONTHLY REALISATION REPORT (2026)", COLS));
   rows.push(subtitleRow(`${MONTHS[data.month]} ${data.year}`, COLS));
   rows.push(emptyRow(COLS));
 
   // ─ Production Section ─
-  rows.push(sectionRow('PRODUCTION SUMMARY', COLS));
+  rows.push(sectionRow("PRODUCTION SUMMARY", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Metric', S.header), sc('Frame 41', S.header), sc('Frame 47', S.header), sc('Total', S.header), sc('Unit', S.header), sc('Days', S.header), sc('Avg/Day', S.header)]);
+  rows.push([
+    sc("Metric", S.header),
+    sc("Value", S.header),
+    sc("Unit", S.header),
+    sc("Days", S.header),
+    sc("Avg/Day", S.header),
+    sc("Efficiency", S.headerBlue),
+    sc("Notes", S.header),
+  ]);
 
-  const totalProd = n(data.production?.totalProductionKg);
+  const totalGross = n(data.production?.totalGrossKgs);
+  const totalNet = n(data.production?.totalNetKgs);
+  const totalShiftWaste = n(data.production?.totalShiftWasteKgs);
   const days = data.production?.daysRecorded || 1;
-  rows.push([sc('Spinning Production', S.cellBoldLeft), sc(n(data.production?.frame41Kg), S.cell), sc(n(data.production?.frame47Kg), S.cell), sc(totalProd, S.cellBold), sc('kg', S.cell), sc(days, S.cell), sc(totalProd / days, S.cell)]);
-  rows.push([sc('Autocorner Production', S.cellBoldLeft), sc('—', S.cell), sc('—', S.cell), sc(n(data.production?.totalAutocornerKg), S.cellBold), sc('kg', S.cell), empty(), empty()]);
-  rows.push([sc('Packing', S.cellBoldLeft), sc('—', S.cell), sc('—', S.cell), sc(n(data.production?.totalPackingKg), S.cellBold), sc('kg', S.cell), empty(), empty()]);
+  const avgEff = data.production?.avgEfficiency || "0";
+  rows.push([
+    sc("Gross Production", S.cellBoldLeft),
+    sc(totalGross, S.cellBold),
+    sc("kg", S.cell),
+    sc(days, S.cell),
+    sc((totalGross / days).toFixed(1), S.cell),
+    sc(`${avgEff}%`, S.highlight),
+    sc("ActualHK × STDConst", S.cellLeft),
+  ]);
+  rows.push([
+    sc("Net Production", S.cellBoldLeft),
+    sc(totalNet, S.cellBold),
+    sc("kg", S.cell),
+    empty(),
+    empty(),
+    empty(),
+    sc("Gross − Waste", S.cellLeft),
+  ]);
+  rows.push([
+    sc("Shift Waste", S.cellBoldLeft),
+    sc(totalShiftWaste, S.highlightAmber),
+    sc("kg", S.cell),
+    empty(),
+    empty(),
+    empty(),
+    sc(`${data.production?.shiftWastePercent || 0}% of gross`, S.cellLeft),
+  ]);
 
   rows.push(emptyRow(COLS));
 
-  // ─ Loss Section ─
-  rows.push(sectionRow('LOSS ANALYSIS', COLS));
-  merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Metric', S.header), sc('Loss (kg)', S.headerBlue), sc('Loss %', S.headerBlue), sc('Status', S.header), ...Array(COLS - 4).fill(sc('', S.header))]);
-
-  const slp = n(data.production?.spinningLossPercent);
-  const alp = n(data.production?.autocornerLossPercent);
-  const spinLossKg = totalProd - n(data.production?.totalAutocornerKg);
-  const autoLossKg = n(data.production?.totalAutocornerKg) - n(data.production?.totalPackingKg);
-  rows.push([sc('Spinning Loss', S.cellBoldLeft), sc(spinLossKg, S.cell), sc(slp, slp > 5 ? S.warning : S.highlight), sc(slp > 5 ? '⚠ HIGH' : '✓ OK', slp > 5 ? S.warning : S.highlight), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('Autocorner Loss', S.cellBoldLeft), sc(autoLossKg, S.cell), sc(alp, alp > 5 ? S.warning : S.highlight), sc(alp > 5 ? '⚠ HIGH' : '✓ OK', alp > 5 ? S.warning : S.highlight), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('Total Loss', S.cellBoldLeft), sc(spinLossKg + autoLossKg, S.warning), sc('—', S.cell), sc('', S.cell), ...Array(COLS - 4).fill(empty())]);
-
-  rows.push(emptyRow(COLS));
+  // ─ Count-wise Breakdown ─
+  const countBreakdown = data.production?.countBreakdown || [];
+  if (countBreakdown.length > 0) {
+    rows.push(sectionRow("COUNT-WISE PRODUCTION BREAKDOWN", COLS));
+    merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
+    rows.push([
+      sc("Count", S.header),
+      sc("Gross (kg)", S.header),
+      sc("Net (kg)", S.header),
+      sc("Waste (kg)", S.headerAmber),
+      sc("Waste %", S.headerAmber),
+      sc("Avg Eff %", S.headerBlue),
+      sc("% of Total", S.header),
+    ]);
+    countBreakdown.forEach((cb) => {
+      rows.push([
+        sc(cb.count, S.cellBold),
+        sc(n(cb.grossKgs), S.cell),
+        sc(n(cb.netKgs), S.cell),
+        sc(n(cb.wasteKgs), S.cell),
+        sc(`${cb.wastePercent}%`, S.cell),
+        sc(`${cb.avgEfficiency}%`, S.highlight),
+        sc(`${cb.percentOfTotal}%`, S.cell),
+      ]);
+    });
+    rows.push(emptyRow(COLS));
+  }
 
   // ─ Raw Materials Section ─
-  rows.push(sectionRow('RAW MATERIAL ISSUE', COLS));
+  rows.push(sectionRow("RAW MATERIAL ISSUE", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Material', S.header), sc('Issue (kg)', S.header), sc('% of Total', S.header), ...Array(COLS - 3).fill(sc('', S.header))]);
+  rows.push([
+    sc("Material", S.header),
+    sc("Issue (kg)", S.header),
+    sc("% of Total", S.header),
+    ...Array(COLS - 3).fill(sc("", S.header)),
+  ]);
   const ci = n(data.rawMaterials?.totalCottonIssueKg);
   const matItems = [
-    ['Cotton', n(data.rawMaterials?.cottonIssueKg)],
-    ['Fiber', n(data.rawMaterials?.fiberIssueKg)],
-    ['Viscose', n(data.rawMaterials?.viscoseIssueKg)],
-    ['Excel', n(data.rawMaterials?.excelIssueKg)],
+    ["Cotton", n(data.rawMaterials?.cottonIssueKg)],
+    ["Fiber", n(data.rawMaterials?.fiberIssueKg)],
+    ["Viscose", n(data.rawMaterials?.viscoseIssueKg)],
+    ["Excel", n(data.rawMaterials?.excelIssueKg)],
   ];
   matItems.forEach(([name, val]) => {
-    rows.push([sc(name, S.cellBoldLeft), sc(val, S.cell), sc(ci > 0 ? ((val / ci) * 100).toFixed(1) : 0, S.cell), ...Array(COLS - 3).fill(empty())]);
+    rows.push([
+      sc(name, S.cellBoldLeft),
+      sc(val, S.cell),
+      sc(ci > 0 ? ((val / ci) * 100).toFixed(1) : 0, S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
   });
-  rows.push([sc('TOTAL COTTON ISSUE', S.totalRow), sc(ci, S.totalRow), sc('100%', S.totalRow), ...Array(COLS - 3).fill(sc('', S.totalRow))]);
+  rows.push([
+    sc("TOTAL COTTON ISSUE", S.totalRow),
+    sc(ci, S.totalRow),
+    sc("100%", S.totalRow),
+    ...Array(COLS - 3).fill(sc("", S.totalRow)),
+  ]);
 
   rows.push(emptyRow(COLS));
 
   // ─ Key Metrics ─
-  rows.push(sectionRow('KEY METRICS', COLS));
+  rows.push(sectionRow("KEY METRICS", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Metric', S.header), sc('Value', S.header), sc('Unit', S.header), sc('Formula', S.header), ...Array(COLS - 4).fill(sc('', S.header))]);
-  rows.push([sc('Yarn Realisation', S.cellBoldLeft), sc(n(data.metrics?.yarnRealisationPercent), S.highlight), sc('%', S.cell), sc('(Cotton Issue - Production) / Cotton Issue × 100', S.cellLeft), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('Waste', S.cellBoldLeft), sc(n(data.metrics?.wastePercent), S.highlightAmber), sc('%', S.cell), sc('Waste / Cotton Issue × 100', S.cellLeft), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('Invisible Loss', S.cellBoldLeft), sc(n(data.metrics?.invisibleLossPercent), n(data.metrics?.invisibleLossPercent) > 3 ? S.warning : S.cell), sc('%', S.cell), sc('100 - Realisation - Waste', S.cellLeft), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('Total Waste', S.cellBoldLeft), sc(n(data.metrics?.totalWasteKg), S.cell), sc('kg', S.cell), sc('', S.cell), ...Array(COLS - 4).fill(empty())]);
+  rows.push([
+    sc("Metric", S.header),
+    sc("Value", S.header),
+    sc("Unit", S.header),
+    sc("Formula", S.header),
+    ...Array(COLS - 4).fill(sc("", S.header)),
+  ]);
+  rows.push([
+    sc("Yarn Realisation", S.cellBoldLeft),
+    sc(n(data.metrics?.yarnRealisationPercent), S.highlight),
+    sc("%", S.cell),
+    sc("Gross Production / Cotton Issue × 100", S.cellLeft),
+    ...Array(COLS - 4).fill(empty()),
+  ]);
+  rows.push([
+    sc("Waste", S.cellBoldLeft),
+    sc(n(data.metrics?.wastePercent), S.highlightAmber),
+    sc("%", S.cell),
+    sc("Stock Waste / Cotton Issue × 100", S.cellLeft),
+    ...Array(COLS - 4).fill(empty()),
+  ]);
+  rows.push([
+    sc("Invisible Loss", S.cellBoldLeft),
+    sc(
+      n(data.metrics?.invisibleLossPercent),
+      n(data.metrics?.invisibleLossPercent) > 3 ? S.warning : S.cell,
+    ),
+    sc("%", S.cell),
+    sc("100 − Realisation − Waste", S.cellLeft),
+    ...Array(COLS - 4).fill(empty()),
+  ]);
+  rows.push([
+    sc("Stock Waste", S.cellBoldLeft),
+    sc(n(data.metrics?.totalStockWasteKg), S.cell),
+    sc("kg", S.cell),
+    sc("", S.cell),
+    ...Array(COLS - 4).fill(empty()),
+  ]);
+  rows.push([
+    sc("Avg Efficiency", S.cellBoldLeft),
+    sc(n(avgEff), S.highlight),
+    sc("%", S.cell),
+    sc("SUM(ActualHK) / SUM(StdHK) × 100", S.cellLeft),
+    ...Array(COLS - 4).fill(empty()),
+  ]);
 
   rows.push(emptyRow(COLS));
 
   // ─ Energy Section ─
-  rows.push(sectionRow('ENERGY CONSUMPTION', COLS));
+  rows.push(sectionRow("ENERGY CONSUMPTION", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('EB Units Consumed', S.cellBoldLeft), sc(n(data.energy?.ebUnitsConsumed), S.highlightAmber), empty(), empty(), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('UKG', S.cellBoldLeft), sc(n(data.energy?.ukg), S.highlight), sc('units/kg', S.cell), sc('EB Units / Production', S.cellLeft), ...Array(COLS - 4).fill(empty())]);
+  rows.push([
+    sc("EB Units Consumed", S.cellBoldLeft),
+    sc(n(data.energy?.ebUnitsConsumed), S.highlightAmber),
+    empty(),
+    empty(),
+    ...Array(COLS - 4).fill(empty()),
+  ]);
+  rows.push([
+    sc("UKG", S.cellBoldLeft),
+    sc(n(data.energy?.ukg), S.highlight),
+    sc("units/kg", S.cell),
+    sc("EB Units / Gross Production", S.cellLeft),
+    ...Array(COLS - 4).fill(empty()),
+  ]);
 
   rows.push(emptyRow(COLS));
-  rows.push(sectionRow(`Report generated: ${new Date().toLocaleString('en-IN')}`, COLS));
+  rows.push(
+    sectionRow(`Report generated: ${new Date().toLocaleString("en-IN")}`, COLS),
+  );
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
 
-  addSheet(wb, rows, 'Monthly Realisation', [22, 16, 14, 14, 10, 10, 28], merges);
+  addSheet(
+    wb,
+    rows,
+    "Monthly Realisation",
+    [22, 16, 14, 14, 10, 10, 28],
+    merges,
+  );
   download(wb, `SpinLytics_Monthly_${MONTHS[data.month]}_${data.year}.xlsx`);
 }
 
@@ -428,63 +659,250 @@ export function exportStockReport(data) {
   const COLS = 9;
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
-  const { currentStock = [], lotWise = [], recentTransactions = [] } = data || {};
+  const {
+    currentStock = [],
+    lotWise = [],
+    recentTransactions = [],
+  } = data || {};
 
-  rows.push(titleRow('SPINLYTICS — STOCK REPORT', COLS));
-  rows.push(subtitleRow(`Generated: ${new Date().toLocaleDateString('en-IN')}`, COLS));
+  rows.push(titleRow("SPINLYTICS — STOCK REPORT", COLS));
+  rows.push(
+    subtitleRow(`Generated: ${new Date().toLocaleDateString("en-IN")}`, COLS),
+  );
   rows.push(emptyRow(COLS));
 
   // Current Stock
-  rows.push(sectionRow('CURRENT STOCK SUMMARY', COLS));
+  rows.push(sectionRow("CURRENT STOCK SUMMARY", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Material', S.header), sc('Stock (Bags)', S.header), sc('Stock (kg)', S.header), sc('Value Status', S.header), ...Array(COLS - 4).fill(sc('', S.header))]);
+  rows.push([
+    sc("Material", S.header),
+    sc("Stock (Bags)", S.header),
+    sc("Stock (kg)", S.header),
+    sc("Value Status", S.header),
+    ...Array(COLS - 4).fill(sc("", S.header)),
+  ]);
   let totalStockKg = 0;
-  currentStock.forEach(s => {
+  currentStock.forEach((s) => {
     const kg = n(s.currentStockKg);
     totalStockKg += kg;
-    rows.push([sc(s.materialType, S.cellBoldLeft), sc(n(s.currentStockBags), S.cell), sc(kg, S.cellBold), sc(kg > 0 ? 'In Stock' : 'Out of Stock', kg > 0 ? S.highlight : S.warning), ...Array(COLS - 4).fill(empty())]);
+    rows.push([
+      sc(s.materialType, S.cellBoldLeft),
+      sc(n(s.currentStockBags), S.cell),
+      sc(kg, S.cellBold),
+      sc(
+        kg > 0 ? "In Stock" : "Out of Stock",
+        kg > 0 ? S.highlight : S.warning,
+      ),
+      ...Array(COLS - 4).fill(empty()),
+    ]);
   });
-  rows.push([sc('TOTAL', S.totalRow), sc('', S.totalRow), sc(totalStockKg, S.totalRow), sc('', S.totalRow), ...Array(COLS - 4).fill(sc('', S.totalRow))]);
+  rows.push([
+    sc("TOTAL", S.totalRow),
+    sc("", S.totalRow),
+    sc(totalStockKg, S.totalRow),
+    sc("", S.totalRow),
+    ...Array(COLS - 4).fill(sc("", S.totalRow)),
+  ]);
 
   rows.push(emptyRow(COLS));
 
   // Lot-wise Stock
-  rows.push(sectionRow('LOT-WISE STOCK BREAKDOWN', COLS));
+  rows.push(sectionRow("LOT-WISE STOCK BREAKDOWN", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Material', S.header), sc('Lot No', S.header), sc('Stock (kg)', S.header), ...Array(COLS - 3).fill(sc('', S.header))]);
-  const sorted = [...lotWise].sort((a, b) => a.materialType.localeCompare(b.materialType));
-  let prevMaterial = '';
-  sorted.forEach(item => {
+  rows.push([
+    sc("Material", S.header),
+    sc("Lot No", S.header),
+    sc("Stock (kg)", S.header),
+    ...Array(COLS - 3).fill(sc("", S.header)),
+  ]);
+  const sorted = [...lotWise].sort((a, b) =>
+    a.materialType.localeCompare(b.materialType),
+  );
+  let prevMaterial = "";
+  sorted.forEach((item) => {
     const isSameMaterial = item.materialType === prevMaterial;
-    rows.push([sc(isSameMaterial ? '' : item.materialType, isSameMaterial ? S.cellLeft : S.cellBoldLeft), sc(item.lotNo, S.cellLeft), sc(n(item.kgs), S.cell), ...Array(COLS - 3).fill(empty())]);
+    rows.push([
+      sc(
+        isSameMaterial ? "" : item.materialType,
+        isSameMaterial ? S.cellLeft : S.cellBoldLeft,
+      ),
+      sc(item.lotNo, S.cellLeft),
+      sc(n(item.kgs), S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
     prevMaterial = item.materialType;
   });
 
   rows.push(emptyRow(COLS));
 
   // Recent Transactions
-  rows.push(sectionRow('RECENT TRANSACTIONS (Last 20)', COLS));
+  rows.push(sectionRow("RECENT TRANSACTIONS (Last 20)", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
   rows.push([
-    sc('Date', S.header), sc('Material', S.header), sc('Type', S.header),
-    sc('Lot No', S.header), sc('Party', S.header), sc('Bags', S.header),
-    sc('KG', S.header), sc('Price/Bag', S.header), sc('Remarks', S.header),
+    sc("Date", S.header),
+    sc("Material", S.header),
+    sc("Type", S.header),
+    sc("Lot No", S.header),
+    sc("Party", S.header),
+    sc("Bags", S.header),
+    sc("KG", S.header),
+    sc("Price/Bag", S.header),
+    sc("Remarks", S.header),
   ]);
-  recentTransactions.forEach(txn => {
-    const isInflow = ['PURCHASE', 'RETURN'].includes(txn.transactionType);
+  recentTransactions.forEach((txn) => {
+    const isInflow = ["PURCHASE", "RETURN"].includes(txn.transactionType);
     const typeStyle = isInflow ? S.highlight : S.highlightAmber;
     rows.push([
-      sc(new Date(txn.date).toLocaleDateString('en-IN'), S.cell),
-      sc(txn.materialType, S.cellLeft), sc(txn.transactionType, typeStyle),
-      sc(txn.lotNo, S.cellLeft), sc(txn.partyName, S.cellLeft),
-      sc(n(txn.bags), S.cell), sc(n(txn.kgs), S.cell),
-      sc(txn.pricePerBag ? n(txn.pricePerBag) : '—', S.cell),
-      sc(txn.remarks || '—', S.cellLeft),
+      sc(new Date(txn.date).toLocaleDateString("en-IN"), S.cell),
+      sc(txn.materialType, S.cellLeft),
+      sc(txn.transactionType, typeStyle),
+      sc(txn.lotNo, S.cellLeft),
+      sc(txn.partyName, S.cellLeft),
+      sc(n(txn.bags), S.cell),
+      sc(n(txn.kgs), S.cell),
+      sc(txn.pricePerBag ? n(txn.pricePerBag) : "—", S.cell),
+      sc(txn.remarks || "—", S.cellLeft),
     ]);
   });
 
-  addSheet(wb, rows, 'Stock Report', [14, 14, 14, 14, 22, 12, 12, 12, 28], merges);
-  download(wb, `SpinLytics_Stock_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+  addSheet(
+    wb,
+    rows,
+    "Stock Report",
+    [14, 14, 14, 14, 22, 12, 12, 12, 28],
+    merges,
+  );
+  download(
+    wb,
+    `SpinLytics_Stock_Report_${new Date().toISOString().split("T")[0]}.xlsx`,
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// REPORT: Material Movement Report
+// ─────────────────────────────────────────────────────────────
+export function exportMaterialMovement(data) {
+  const wb = createWorkbook();
+  const COLS = 9;
+  const rows = [];
+  const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
+  const { recentTransactions = [] } = data || {};
+
+  rows.push(titleRow("SPINLYTICS — MATERIAL MOVEMENT REPORT", COLS));
+  rows.push(
+    subtitleRow(`Generated: ${new Date().toLocaleDateString("en-IN")}`, COLS),
+  );
+  rows.push(emptyRow(COLS));
+
+  // Movement summary by material type
+  rows.push(sectionRow("MOVEMENT SUMMARY BY MATERIAL", COLS));
+  merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
+  rows.push([
+    sc("Material", S.header),
+    sc("Inflow (PURCHASE)", S.header),
+    sc("Inflow (RETURN)", S.header),
+    sc("Total In (kg)", S.header),
+    sc("Outflow (ISSUE)", S.header),
+    sc("Outflow (DISPATCH)", S.header),
+    sc("Total Out (kg)", S.header),
+    sc("Net Movement (kg)", S.header),
+    sc("", S.header),
+  ]);
+
+  const materialMap = {};
+  recentTransactions.forEach((txn) => {
+    const mat = txn.materialType;
+    if (!materialMap[mat]) {
+      materialMap[mat] = { PURCHASE: 0, RETURN: 0, ISSUE: 0, DISPATCH: 0 };
+    }
+    materialMap[mat][txn.transactionType] =
+      (materialMap[mat][txn.transactionType] || 0) + n(txn.kgs);
+  });
+
+  let grandTotalIn = 0;
+  let grandTotalOut = 0;
+  Object.keys(materialMap)
+    .sort()
+    .forEach((mat) => {
+      const m = materialMap[mat];
+      const totalIn = m.PURCHASE + m.RETURN;
+      const totalOut = m.ISSUE + m.DISPATCH;
+      const net = totalIn - totalOut;
+      grandTotalIn += totalIn;
+      grandTotalOut += totalOut;
+      rows.push([
+        sc(mat, S.cellBoldLeft),
+        sc(m.PURCHASE, S.highlight),
+        sc(m.RETURN, S.highlightBlue),
+        sc(totalIn, S.cellBold),
+        sc(m.ISSUE, S.highlightAmber),
+        sc(m.DISPATCH, S.warning),
+        sc(totalOut, S.cellBold),
+        sc(net, net >= 0 ? S.highlight : S.warning),
+        empty(),
+      ]);
+    });
+
+  const grandNet = grandTotalIn - grandTotalOut;
+  rows.push([
+    sc("TOTAL", S.totalRow),
+    sc("", S.totalRow),
+    sc("", S.totalRow),
+    sc(grandTotalIn, S.totalRow),
+    sc("", S.totalRow),
+    sc("", S.totalRow),
+    sc(grandTotalOut, S.totalRow),
+    sc(grandNet, S.totalRow),
+    sc("", S.totalRow),
+  ]);
+
+  rows.push(emptyRow(COLS));
+
+  // Full transaction log
+  rows.push(sectionRow("TRANSACTION LOG", COLS));
+  merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
+  rows.push([
+    sc("Date", S.header),
+    sc("Material", S.header),
+    sc("Type", S.header),
+    sc("Lot No", S.header),
+    sc("Party", S.header),
+    sc("Bags", S.header),
+    sc("KG", S.header),
+    sc("Price/Bag", S.header),
+    sc("Remarks", S.header),
+  ]);
+
+  const sorted = [...recentTransactions].sort(
+    (a, b) => new Date(b.date) - new Date(a.date),
+  );
+  sorted.forEach((txn) => {
+    const isInflow = ["PURCHASE", "RETURN"].includes(txn.transactionType);
+    const typeStyle = isInflow ? S.highlight : S.highlightAmber;
+    rows.push([
+      sc(new Date(txn.date).toLocaleDateString("en-IN"), S.cell),
+      sc(txn.materialType, S.cellLeft),
+      sc(txn.transactionType, typeStyle),
+      sc(txn.lotNo || "—", S.cellLeft),
+      sc(txn.partyName || "—", S.cellLeft),
+      sc(n(txn.bags), S.cell),
+      sc(n(txn.kgs), S.cell),
+      sc(txn.pricePerBag ? n(txn.pricePerBag) : "—", S.cell),
+      sc(txn.remarks || "—", S.cellLeft),
+    ]);
+  });
+
+  addSheet(
+    wb,
+    rows,
+    "Material Movement",
+    [14, 14, 16, 14, 22, 12, 12, 12, 28],
+    merges,
+  );
+  download(
+    wb,
+    `SpinLytics_Material_Movement_${new Date().toISOString().split("T")[0]}.xlsx`,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -492,426 +910,758 @@ export function exportStockReport(data) {
 // ─────────────────────────────────────────────────────────────
 export function exportYearlySummary(data) {
   const wb = createWorkbook();
-  const MONTHS = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const COLS = 12;
+  const MONTHS = [
+    "",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const COLS = 10;
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1)];
 
-  rows.push(titleRow(`SPINLYTICS — YEARLY REPORT ${data.year}`, COLS));
+  rows.push(
+    titleRow(`SPINLYTICS — YEARLY REPORT ${data.year} (2026 Standard)`, COLS),
+  );
   rows.push(emptyRow(COLS));
 
   // Monthly Production Breakdown
-  rows.push(sectionRow('MONTHLY PRODUCTION BREAKDOWN', COLS));
+  rows.push(sectionRow("MONTHLY PRODUCTION BREAKDOWN", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
   rows.push([
-    sc('Month', S.header), sc('Frame 41 (kg)', S.header), sc('Frame 47 (kg)', S.header),
-    sc('Total Prod (kg)', S.header), sc('Packing (kg)', S.header),
-    sc('Spinning Loss %', S.headerBlue), sc('Auto Loss %', S.headerPurple),
-    sc('Yarn Realisation %', S.header), sc('Waste %', S.headerAmber), sc('Invisible Loss %', S.headerRed),
-    sc('UKG', S.header), sc('Days', S.header),
+    sc("Month", S.header),
+    sc("Gross Prod (kg)", S.header),
+    sc("Net Prod (kg)", S.header),
+    sc("Avg Eff %", S.headerBlue),
+    sc("Yarn Realisation %", S.header),
+    sc("Waste %", S.headerAmber),
+    sc("Invisible Loss %", S.headerRed),
+    sc("UKG", S.header),
+    sc("Days", S.header),
+    sc("Avg/Day (kg)", S.header),
   ]);
 
-  let yearTotalProd = 0, yearTotalPack = 0, yearTotalF41 = 0, yearTotalF47 = 0;
-  (data.months || []).forEach(m => {
-    const prod = n(m.production?.totalProductionKg);
-    const pack = n(m.production?.totalPackingKg);
-    const f41 = n(m.production?.frame41Kg);
-    const f47 = n(m.production?.frame47Kg);
-    yearTotalProd += prod;
-    yearTotalPack += pack;
-    yearTotalF41 += f41;
-    yearTotalF47 += f47;
-    if (prod === 0) return;
+  let yearTotalGross = 0,
+    yearTotalNet = 0;
+  (data.months || []).forEach((m) => {
+    const gross = n(m.production?.totalGrossKgs);
+    const net = n(m.production?.totalNetKgs);
+    yearTotalGross += gross;
+    yearTotalNet += net;
+    if (gross === 0) return;
+    const days = m.production?.daysRecorded || 1;
     rows.push([
-      sc(MONTHS[m.month], S.cellBold), sc(f41, S.cell), sc(f47, S.cell),
-      sc(prod, S.cellBold), sc(pack, S.cell),
-      sc(n(m.production?.spinningLossPercent), S.cell), sc(n(m.production?.autocornerLossPercent), S.cell),
-      sc(n(m.metrics?.yarnRealisationPercent), S.highlight), sc(n(m.metrics?.wastePercent), S.cell),
-      sc(n(m.metrics?.invisibleLossPercent), n(m.metrics?.invisibleLossPercent) > 3 ? S.warning : S.cell),
-      sc(n(m.energy?.ukg), S.cell), sc(m.production?.daysRecorded || 0, S.cell),
+      sc(MONTHS[m.month], S.cellBold),
+      sc(gross, S.cell),
+      sc(net, S.cell),
+      sc(n(m.production?.avgEfficiency), S.highlight),
+      sc(n(m.metrics?.yarnRealisationPercent), S.cell),
+      sc(n(m.metrics?.wastePercent), S.cell),
+      sc(
+        n(m.metrics?.invisibleLossPercent),
+        n(m.metrics?.invisibleLossPercent) > 3 ? S.warning : S.cell,
+      ),
+      sc(n(m.energy?.ukg), S.cell),
+      sc(days, S.cell),
+      sc((gross / days).toFixed(1), S.cell),
     ]);
   });
 
   rows.push([
-    sc('TOTAL', S.totalRow), sc(yearTotalF41, S.totalRow), sc(yearTotalF47, S.totalRow),
-    sc(yearTotalProd, S.totalRow), sc(yearTotalPack, S.totalRow),
-    ...Array(COLS - 5).fill(sc('', S.totalRow)),
+    sc("TOTAL", S.totalRow),
+    sc(yearTotalGross, S.totalRow),
+    sc(yearTotalNet, S.totalRow),
+    ...Array(COLS - 3).fill(sc("", S.totalRow)),
   ]);
 
   rows.push(emptyRow(COLS));
 
   // Yearly Aggregated KPIs
-  rows.push(sectionRow('YEARLY KEY PERFORMANCE INDICATORS', COLS));
+  rows.push(sectionRow("YEARLY KEY PERFORMANCE INDICATORS", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Metric', S.headerAmber), sc('Value', S.headerAmber), sc('Unit', S.headerAmber), ...Array(COLS - 3).fill(sc('', S.headerAmber))]);
-  rows.push([sc('Total Production', S.cellBoldLeft), sc(yearTotalProd, S.highlight), sc('kg', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Total Packing', S.cellBoldLeft), sc(yearTotalPack, S.highlightBlue), sc('kg', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Frame 41 Share', S.cellBoldLeft), sc(yearTotalProd > 0 ? ((yearTotalF41 / yearTotalProd) * 100).toFixed(1) : 0, S.cell), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Frame 47 Share', S.cellBoldLeft), sc(yearTotalProd > 0 ? ((yearTotalF47 / yearTotalProd) * 100).toFixed(1) : 0, S.cell), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Overall Yield', S.cellBoldLeft), sc(yearTotalProd > 0 ? ((yearTotalPack / yearTotalProd) * 100).toFixed(1) : 0, S.highlightPurple), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);
-  const totalLostYear = yearTotalProd - yearTotalPack;
-  rows.push([sc('Total Material Lost', S.cellBoldLeft), sc(totalLostYear, S.warning), sc('kg', S.cell), ...Array(COLS - 3).fill(empty())]);
+  rows.push([
+    sc("Metric", S.headerAmber),
+    sc("Value", S.headerAmber),
+    sc("Unit", S.headerAmber),
+    ...Array(COLS - 3).fill(sc("", S.headerAmber)),
+  ]);
+  rows.push([
+    sc("Total Gross Production", S.cellBoldLeft),
+    sc(yearTotalGross, S.highlight),
+    sc("kg", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Total Net Production", S.cellBoldLeft),
+    sc(yearTotalNet, S.highlightBlue),
+    sc("kg", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Total Waste (Shift)", S.cellBoldLeft),
+    sc((yearTotalGross - yearTotalNet).toFixed(1), S.highlightAmber),
+    sc("kg", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Net Yield", S.cellBoldLeft),
+    sc(
+      yearTotalGross > 0
+        ? ((yearTotalNet / yearTotalGross) * 100).toFixed(1)
+        : 0,
+      S.highlightPurple,
+    ),
+    sc("%", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
 
   // Active months and averages
-  const activeMonths = (data.months || []).filter(m => n(m.production?.totalProductionKg) > 0);
-  const totalDays = activeMonths.reduce((s, m) => s + (m.production?.daysRecorded || 0), 0);
-  rows.push([sc('Active Months', S.cellBoldLeft), sc(activeMonths.length, S.cell), sc('/ 12', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Total Working Days', S.cellBoldLeft), sc(totalDays, S.cell), sc('days', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Avg Monthly Production', S.cellBoldLeft), sc(activeMonths.length > 0 ? (yearTotalProd / activeMonths.length).toFixed(0) : 0, S.highlight), sc('kg/month', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Avg Daily Production', S.cellBoldLeft), sc(totalDays > 0 ? (yearTotalProd / totalDays).toFixed(1) : 0, S.cell), sc('kg/day', S.cell), ...Array(COLS - 3).fill(empty())]);
+  const activeMonths = (data.months || []).filter(
+    (m) => n(m.production?.totalGrossKgs) > 0,
+  );
+  const totalDays = activeMonths.reduce(
+    (s, m) => s + (m.production?.daysRecorded || 0),
+    0,
+  );
+  rows.push([
+    sc("Active Months", S.cellBoldLeft),
+    sc(activeMonths.length, S.cell),
+    sc("/ 12", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Total Working Days", S.cellBoldLeft),
+    sc(totalDays, S.cell),
+    sc("days", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Avg Monthly Production", S.cellBoldLeft),
+    sc(
+      activeMonths.length > 0
+        ? (yearTotalGross / activeMonths.length).toFixed(0)
+        : 0,
+      S.highlight,
+    ),
+    sc("kg/month", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Avg Daily Production", S.cellBoldLeft),
+    sc(totalDays > 0 ? (yearTotalGross / totalDays).toFixed(1) : 0, S.cell),
+    sc("kg/day", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
 
   rows.push(emptyRow(COLS));
 
   // Energy section
-  const yearEB = activeMonths.reduce((s, m) => s + n(m.energy?.ebUnitsConsumed), 0);
-  rows.push(sectionRow('ENERGY CONSUMPTION (YEARLY)', COLS));
+  const yearEB = activeMonths.reduce(
+    (s, m) => s + n(m.energy?.ebUnitsConsumed),
+    0,
+  );
+  rows.push(sectionRow("ENERGY CONSUMPTION (YEARLY)", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Metric', S.headerAmber), sc('Value', S.headerAmber), sc('Unit', S.headerAmber), ...Array(COLS - 3).fill(sc('', S.headerAmber))]);
-  rows.push([sc('Total EB Consumed', S.cellBoldLeft), sc(yearEB, S.highlightAmber), sc('units', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Avg UKG (Year)', S.cellBoldLeft), sc(yearTotalProd > 0 ? (yearEB / yearTotalProd).toFixed(4) : 0, S.highlight), sc('units/kg', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Avg Monthly EB', S.cellBoldLeft), sc(activeMonths.length > 0 ? (yearEB / activeMonths.length).toFixed(0) : 0, S.cell), sc('units/month', S.cell), ...Array(COLS - 3).fill(empty())]);
+  rows.push([
+    sc("Metric", S.headerAmber),
+    sc("Value", S.headerAmber),
+    sc("Unit", S.headerAmber),
+    ...Array(COLS - 3).fill(sc("", S.headerAmber)),
+  ]);
+  rows.push([
+    sc("Total EB Consumed", S.cellBoldLeft),
+    sc(yearEB, S.highlightAmber),
+    sc("units", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Avg UKG (Year)", S.cellBoldLeft),
+    sc(
+      yearTotalGross > 0 ? (yearEB / yearTotalGross).toFixed(4) : 0,
+      S.highlight,
+    ),
+    sc("units/kg", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Avg Monthly EB", S.cellBoldLeft),
+    sc(
+      activeMonths.length > 0 ? (yearEB / activeMonths.length).toFixed(0) : 0,
+      S.cell,
+    ),
+    sc("units/month", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
 
   rows.push(emptyRow(COLS));
 
   // Raw Materials section
-  const yrCotton = activeMonths.reduce((s, m) => s + n(m.rawMaterials?.cottonIssueKg), 0);
-  const yrFiber = activeMonths.reduce((s, m) => s + n(m.rawMaterials?.fiberIssueKg), 0);
-  const yrViscose = activeMonths.reduce((s, m) => s + n(m.rawMaterials?.viscoseIssueKg), 0);
-  const yrExcel = activeMonths.reduce((s, m) => s + n(m.rawMaterials?.excelIssueKg), 0);
+  const yrCotton = activeMonths.reduce(
+    (s, m) => s + n(m.rawMaterials?.cottonIssueKg),
+    0,
+  );
+  const yrFiber = activeMonths.reduce(
+    (s, m) => s + n(m.rawMaterials?.fiberIssueKg),
+    0,
+  );
+  const yrViscose = activeMonths.reduce(
+    (s, m) => s + n(m.rawMaterials?.viscoseIssueKg),
+    0,
+  );
+  const yrExcel = activeMonths.reduce(
+    (s, m) => s + n(m.rawMaterials?.excelIssueKg),
+    0,
+  );
   const yrTotalCI = yrCotton + yrFiber + yrViscose + yrExcel;
   if (yrTotalCI > 0) {
-    rows.push(sectionRow('RAW MATERIAL ISSUE (YEARLY)', COLS));
+    rows.push(sectionRow("RAW MATERIAL ISSUE (YEARLY)", COLS));
     merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-    rows.push([sc('Material', S.header), sc('Total (kg)', S.header), sc('Share %', S.header), ...Array(COLS - 3).fill(sc('', S.header))]);
-    rows.push([sc('Cotton', S.cellBoldLeft), sc(yrCotton, S.cell), sc(((yrCotton / yrTotalCI) * 100).toFixed(1), S.cell), ...Array(COLS - 3).fill(empty())]);
-    rows.push([sc('Fiber', S.cellBoldLeft), sc(yrFiber, S.cell), sc(((yrFiber / yrTotalCI) * 100).toFixed(1), S.cell), ...Array(COLS - 3).fill(empty())]);
-    rows.push([sc('Viscose', S.cellBoldLeft), sc(yrViscose, S.cell), sc(((yrViscose / yrTotalCI) * 100).toFixed(1), S.cell), ...Array(COLS - 3).fill(empty())]);
-    rows.push([sc('Excel', S.cellBoldLeft), sc(yrExcel, S.cell), sc(((yrExcel / yrTotalCI) * 100).toFixed(1), S.cell), ...Array(COLS - 3).fill(empty())]);
-    rows.push([sc('TOTAL', S.totalRow), sc(yrTotalCI, S.totalRow), sc('100%', S.totalRow), ...Array(COLS - 3).fill(sc('', S.totalRow))]);
+    rows.push([
+      sc("Material", S.header),
+      sc("Total (kg)", S.header),
+      sc("Share %", S.header),
+      ...Array(COLS - 3).fill(sc("", S.header)),
+    ]);
+    rows.push([
+      sc("Cotton", S.cellBoldLeft),
+      sc(yrCotton, S.cell),
+      sc(((yrCotton / yrTotalCI) * 100).toFixed(1), S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    rows.push([
+      sc("Fiber", S.cellBoldLeft),
+      sc(yrFiber, S.cell),
+      sc(((yrFiber / yrTotalCI) * 100).toFixed(1), S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    rows.push([
+      sc("Viscose", S.cellBoldLeft),
+      sc(yrViscose, S.cell),
+      sc(((yrViscose / yrTotalCI) * 100).toFixed(1), S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    rows.push([
+      sc("Excel", S.cellBoldLeft),
+      sc(yrExcel, S.cell),
+      sc(((yrExcel / yrTotalCI) * 100).toFixed(1), S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    rows.push([
+      sc("TOTAL", S.totalRow),
+      sc(yrTotalCI, S.totalRow),
+      sc("100%", S.totalRow),
+      ...Array(COLS - 3).fill(sc("", S.totalRow)),
+    ]);
 
     rows.push(emptyRow(COLS));
-    rows.push([sc('Yarn Realisation (Year)', S.cellBoldLeft), sc((((yrTotalCI - yearTotalProd) / yrTotalCI) * 100).toFixed(2), S.highlight), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);
-    const yrWaste = activeMonths.reduce((s, m) => s + n(m.metrics?.totalWasteKg), 0);
-    rows.push([sc('Total Waste', S.cellBoldLeft), sc(yrWaste, S.highlightAmber), sc('kg', S.cell), ...Array(COLS - 3).fill(empty())]);
-    rows.push([sc('Waste %', S.cellBoldLeft), sc(((yrWaste / yrTotalCI) * 100).toFixed(2), S.cell), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);
+    rows.push([
+      sc("Yarn Realisation (Year)", S.cellBoldLeft),
+      sc(((yearTotalGross / yrTotalCI) * 100).toFixed(2), S.highlight),
+      sc("%", S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    const yrWaste = activeMonths.reduce(
+      (s, m) => s + n(m.metrics?.totalStockWasteKg),
+      0,
+    );
+    rows.push([
+      sc("Total Waste", S.cellBoldLeft),
+      sc(yrWaste, S.highlightAmber),
+      sc("kg", S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    rows.push([
+      sc("Waste %", S.cellBoldLeft),
+      sc(((yrWaste / yrTotalCI) * 100).toFixed(2), S.cell),
+      sc("%", S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
     rows.push(emptyRow(COLS));
   }
 
   // Best/Worst Month
   if (activeMonths.length > 1) {
-    const sorted = [...activeMonths].sort((a, b) => n(b.production?.totalProductionKg) - n(a.production?.totalProductionKg));
-    rows.push(sectionRow('PERFORMANCE HIGHLIGHTS', COLS));
+    const sorted = [...activeMonths].sort(
+      (a, b) => n(b.production?.totalGrossKgs) - n(a.production?.totalGrossKgs),
+    );
+    rows.push(sectionRow("PERFORMANCE HIGHLIGHTS", COLS));
     merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-    rows.push([sc('Best Month (Prod)', S.cellBoldLeft), sc(MONTHS[sorted[0].month], S.highlight), sc(`${n(sorted[0].production?.totalProductionKg).toFixed(0)} kg`, S.cell), ...Array(COLS - 3).fill(empty())]);
-    rows.push([sc('Lowest Month (Prod)', S.cellBoldLeft), sc(MONTHS[sorted[sorted.length - 1].month], S.highlightAmber), sc(`${n(sorted[sorted.length - 1].production?.totalProductionKg).toFixed(0)} kg`, S.cell), ...Array(COLS - 3).fill(empty())]);
-    const ukgMonths = activeMonths.filter(m => n(m.energy?.ukg) > 0).sort((a, b) => n(a.energy?.ukg) - n(b.energy?.ukg));
+    rows.push([
+      sc("Best Month (Prod)", S.cellBoldLeft),
+      sc(MONTHS[sorted[0].month], S.highlight),
+      sc(`${n(sorted[0].production?.totalGrossKgs).toFixed(0)} kg`, S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    rows.push([
+      sc("Lowest Month (Prod)", S.cellBoldLeft),
+      sc(MONTHS[sorted[sorted.length - 1].month], S.highlightAmber),
+      sc(
+        `${n(sorted[sorted.length - 1].production?.totalGrossKgs).toFixed(0)} kg`,
+        S.cell,
+      ),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    const ukgMonths = activeMonths
+      .filter((m) => n(m.energy?.ukg) > 0)
+      .sort((a, b) => n(a.energy?.ukg) - n(b.energy?.ukg));
     if (ukgMonths.length > 0) {
-      rows.push([sc('Best UKG Month', S.cellBoldLeft), sc(MONTHS[ukgMonths[0].month], S.highlight), sc(`UKG: ${ukgMonths[0].energy?.ukg}`, S.cell), ...Array(COLS - 3).fill(empty())]);
-      if (ukgMonths.length > 1) rows.push([sc('Worst UKG Month', S.cellBoldLeft), sc(MONTHS[ukgMonths[ukgMonths.length - 1].month], S.warning), sc(`UKG: ${ukgMonths[ukgMonths.length - 1].energy?.ukg}`, S.cell), ...Array(COLS - 3).fill(empty())]);
+      rows.push([
+        sc("Best UKG Month", S.cellBoldLeft),
+        sc(MONTHS[ukgMonths[0].month], S.highlight),
+        sc(`UKG: ${ukgMonths[0].energy?.ukg}`, S.cell),
+        ...Array(COLS - 3).fill(empty()),
+      ]);
+      if (ukgMonths.length > 1)
+        rows.push([
+          sc("Worst UKG Month", S.cellBoldLeft),
+          sc(MONTHS[ukgMonths[ukgMonths.length - 1].month], S.warning),
+          sc(`UKG: ${ukgMonths[ukgMonths.length - 1].energy?.ukg}`, S.cell),
+          ...Array(COLS - 3).fill(empty()),
+        ]);
     }
   }
 
   rows.push(emptyRow(COLS));
-  rows.push(sectionRow(`Report generated: ${new Date().toLocaleString('en-IN')}`, COLS));
+  rows.push(
+    sectionRow(`Report generated: ${new Date().toLocaleString("en-IN")}`, COLS),
+  );
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
 
-  addSheet(wb, rows, 'Yearly Summary', [10, 14, 14, 16, 14, 14, 14, 16, 12, 16, 10, 8], merges);
+  addSheet(
+    wb,
+    rows,
+    "Yearly Summary",
+    [10, 16, 16, 12, 16, 12, 16, 10, 8, 12],
+    merges,
+  );
   download(wb, `SpinLytics_Yearly_${data.year}.xlsx`);
 }
 
 // ─────────────────────────────────────────────────────────────
-// REPORT 5: Production Log (Date Range) — Enhanced
+// REPORT 5: Shift Production Log (2026 Standard)
 // ─────────────────────────────────────────────────────────────
 export function exportProductionLog(entries, dateRange) {
   const wb = createWorkbook();
-  const COLS = 12;
+  const COLS = 13;
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
 
-  rows.push(titleRow('SPINLYTICS — PRODUCTION LOG', COLS));
-  rows.push(subtitleRow(dateRange || `All Entries (${entries?.length || 0} records)`, COLS));
+  rows.push(titleRow("SPINLYTICS — SHIFT PRODUCTION LOG (2026)", COLS));
+  rows.push(
+    subtitleRow(
+      dateRange || `All Entries (${entries?.length || 0} records)`,
+      COLS,
+    ),
+  );
   rows.push(emptyRow(COLS));
 
   rows.push([
-    sc('Date', S.header), sc('Frame', S.header), sc('Production (kg)', S.header),
-    sc('Autocorner (kg)', S.header), sc('Packing (kg)', S.header),
-    sc('EB Units', S.header), sc('Spindles', S.header),
-    sc('Spin Loss (kg)', S.headerBlue), sc('Spin Loss %', S.headerBlue),
-    sc('GPS', S.headerAmber), sc('UKG', S.headerPurple), sc('Remarks', S.header),
+    sc("Date", S.header),
+    sc("R/F No.", S.header),
+    sc("Sider", S.header),
+    sc("Count", S.header),
+    sc("Actual HK", S.header),
+    sc("Gross Kg", S.header),
+    sc("Net Kg", S.header),
+    sc("Waste Kg", S.headerAmber),
+    sc("Waste %", S.headerAmber),
+    sc("Efficiency %", S.headerBlue),
+    sc("Wkd Spindles", S.header),
+    sc("G/Spindle", S.headerPurple),
+    sc("Stoppages", S.header),
   ]);
 
-  let totProd = 0, totAuto = 0, totPack = 0, totEB = 0;
-  (entries || []).forEach(e => {
+  let totGross = 0,
+    totNet = 0,
+    totWaste = 0,
+    totActualHK = 0,
+    totStdHK = 0;
+  (entries || []).forEach((e) => {
     const c = e.calculated || {};
-    const prod = n(e.productionKg);
-    const auto = n(e.autocornerProductionKg);
-    const pack = n(e.packingKg);
-    totProd += prod; totAuto += auto; totPack += pack; totEB += n(e.ebUnits);
+    const gross = n(c.productionKgsGross);
+    const net = n(c.actualProductionKgs);
+    const waste = n(e.wasteKgs);
+    const eff = n(c.efficiencyPercent);
+    totGross += gross;
+    totNet += net;
+    totWaste += waste;
+    totActualHK += n(e.actualHK);
+    totStdHK += n(e.stdHK);
     rows.push([
-      sc(new Date(e.date).toLocaleDateString('en-IN'), S.cell),
-      sc(e.frameNumber === 'FRAME_41' ? 'F41' : 'F47', S.cellBold),
-      sc(prod, S.cell), sc(auto, S.cell), sc(pack, S.cell),
-      sc(n(e.ebUnits), S.cell), sc(e.noOfSpindles, S.cell),
-      sc(prod - auto, S.cell),
-      sc(n(c.spinningLossPercent), n(c.spinningLossPercent) > 5 ? S.warning : S.cell),
-      sc(n(c.gps), S.highlightAmber), sc(n(c.ukg), S.cell),
-      sc(e.remarks || '—', S.cellLeft),
+      sc(new Date(e.date).toLocaleDateString("en-IN"), S.cell),
+      sc(e.rfNo, S.cellBold),
+      sc(e.siderName, S.cellLeft),
+      sc(e.count, S.highlight),
+      sc(n(e.actualHK), S.cell),
+      sc(gross, S.cell),
+      sc(net, S.cell),
+      sc(waste, S.cell),
+      sc(n(c.wastePercent), n(c.wastePercent) > 5 ? S.warning : S.cell),
+      sc(eff, eff < 80 ? S.warning : S.highlight),
+      sc(n(c.workedSpindles), S.cell),
+      sc(n(c.gramsPerSpindle), S.highlightPurple),
+      sc(e.stoppages || "—", S.cellLeft),
     ]);
   });
 
+  const avgEff =
+    totStdHK > 0 ? ((totActualHK / totStdHK) * 100).toFixed(2) : "0";
   rows.push([
-    sc('TOTAL', S.totalRow), sc('', S.totalRow), sc(totProd, S.totalRow),
-    sc(totAuto, S.totalRow), sc(totPack, S.totalRow), sc(totEB, S.totalRow),
-    ...Array(COLS - 6).fill(sc('', S.totalRow)),
+    sc("TOTAL", S.totalRow),
+    sc("", S.totalRow),
+    sc(`${entries?.length || 0} entries`, S.totalRow),
+    sc("", S.totalRow),
+    sc("", S.totalRow),
+    sc(totGross, S.totalRow),
+    sc(totNet, S.totalRow),
+    sc(totWaste, S.totalRow),
+    sc(
+      totGross > 0 ? ((totWaste / totGross) * 100).toFixed(2) + "%" : "0%",
+      S.totalRow,
+    ),
+    sc(`${avgEff}%`, S.totalRow),
+    ...Array(COLS - 10).fill(sc("", S.totalRow)),
   ]);
 
-  addSheet(wb, rows, 'Production Log', [14, 6, 16, 16, 14, 12, 10, 14, 12, 10, 10, 28], merges);
+  addSheet(
+    wb,
+    rows,
+    "Production Log",
+    [14, 10, 16, 10, 12, 12, 12, 12, 10, 12, 14, 12, 28],
+    merges,
+  );
   download(wb, `SpinLytics_Production_Log.xlsx`);
 }
 
 // ─────────────────────────────────────────────────────────────
-// REPORT 6: Stock Transaction Log — Enhanced
+// REPORT: Energy (EB) Log Report
 // ─────────────────────────────────────────────────────────────
-export function exportStockTransactionLog(transactions) {
-  const wb = createWorkbook();
-  const COLS = 10;
-  const rows = [];
-  const merges = [merge(0, 0, 0, COLS - 1)];
+const MONTH_NAMES_EB = [
+  "",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
-  rows.push(titleRow('SPINLYTICS — STOCK TRANSACTIONS', COLS));
+export function exportEBReport(entries) {
+  const wb = createWorkbook();
+  const COLS = 6;
+  const rows = [];
+  const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
+
+  const sorted = [...(entries || [])].sort((a, b) =>
+    a.year !== b.year ? a.year - b.year : a.month - b.month,
+  );
+
+  rows.push(titleRow("SPINLYTICS — ENERGY (EB) LOG", COLS));
+  rows.push(
+    subtitleRow(`Generated: ${new Date().toLocaleDateString("en-IN")}`, COLS),
+  );
   rows.push(emptyRow(COLS));
 
+  // Summary KPIs
+  const totalConsumed = sorted.reduce(
+    (sum, e) => sum + (n(e.closingUnits) - n(e.openingUnits)),
+    0,
+  );
+  const avgMonthly = sorted.length > 0 ? totalConsumed / sorted.length : 0;
+
+  rows.push(sectionRow("SUMMARY", COLS));
+  merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
   rows.push([
-    sc('Date', S.header), sc('Material', S.header), sc('Type', S.header),
-    sc('Lot No', S.header), sc('Party', S.header), sc('Bags', S.header),
-    sc('KG', S.header), sc('Price/Bag', S.header), sc('Total Price', S.header), sc('Remarks', S.header),
+    sc("Metric", S.header),
+    sc("Value", S.header),
+    sc("Unit", S.header),
+    ...Array(COLS - 3).fill(sc("", S.header)),
+  ]);
+  rows.push([
+    sc("Total EB Consumed", S.cellBoldLeft),
+    sc(totalConsumed, S.highlightAmber),
+    sc("units", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Months Recorded", S.cellBoldLeft),
+    sc(sorted.length, S.cell),
+    sc("months", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Avg Monthly Consumption", S.cellBoldLeft),
+    sc(avgMonthly.toFixed(0), S.highlight),
+    sc("units/month", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push(emptyRow(COLS));
+
+  // Monthly detail
+  rows.push(sectionRow("MONTHLY EB DETAIL", COLS));
+  merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
+  rows.push([
+    sc("Month", S.header),
+    sc("Year", S.header),
+    sc("Opening Units", S.header),
+    sc("Closing Units", S.header),
+    sc("Consumed (Units)", S.headerAmber),
+    sc("vs Avg", S.header),
   ]);
 
-  let totBags = 0, totKg = 0, totVal = 0;
-  (transactions || []).forEach(t => {
-    const isInflow = ['PURCHASE', 'RETURN'].includes(t.transactionType);
-    const cellStyle = isInflow ? S.highlight : S.cell;
-    const tp = n(t.totalPrice);
-    totBags += n(t.bags); totKg += n(t.kgs); totVal += tp;
+  sorted.forEach((e) => {
+    const consumed = n(e.closingUnits) - n(e.openingUnits);
+    const vsAvg = avgMonthly > 0 ? consumed - avgMonthly : 0;
     rows.push([
-      sc(new Date(t.date).toLocaleDateString('en-IN'), S.cell),
-      sc(t.materialType, S.cellLeft), sc(t.transactionType, cellStyle),
-      sc(t.lotNo, S.cellLeft), sc(t.partyName, S.cellLeft),
-      sc(n(t.bags), S.cell), sc(n(t.kgs), S.cell),
-      sc(t.pricePerBag ? n(t.pricePerBag) : '—', S.cell),
-      sc(tp || '—', S.cell), sc(t.remarks || '—', S.cellLeft),
+      sc(MONTH_NAMES_EB[e.month] || e.month, S.cellBoldLeft),
+      sc(e.year, S.cell),
+      sc(n(e.openingUnits), S.cell),
+      sc(n(e.closingUnits), S.cell),
+      sc(consumed, consumed > avgMonthly * 1.1 ? S.warning : S.highlightAmber),
+      sc(
+        (vsAvg >= 0 ? "+" : "") + vsAvg.toFixed(0),
+        vsAvg > 0 ? S.warning : S.highlight,
+      ),
     ]);
   });
 
   rows.push([
-    sc('TOTAL', S.totalRow), ...Array(4).fill(sc('', S.totalRow)),
-    sc(totBags, S.totalRow), sc(totKg, S.totalRow), sc('', S.totalRow),
-    sc(totVal || '', S.totalRow), sc('', S.totalRow),
+    sc("TOTAL", S.totalRow),
+    sc("", S.totalRow),
+    sc("", S.totalRow),
+    sc("", S.totalRow),
+    sc(totalConsumed, S.totalRow),
+    sc("", S.totalRow),
   ]);
 
-  addSheet(wb, rows, 'Transactions', [14, 12, 12, 14, 22, 10, 12, 12, 14, 28], merges);
-  download(wb, `SpinLytics_Stock_Transactions.xlsx`);
+  addSheet(wb, rows, "EB Log", [18, 10, 16, 16, 18, 14], merges);
+  download(
+    wb,
+    `SpinLytics_EB_Log_${new Date().toISOString().split("T")[0]}.xlsx`,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
-// REPORT 7: Packing Log — Enhanced
-// ─────────────────────────────────────────────────────────────
-export function exportPackingLog(entries) {
-  const wb = createWorkbook();
-  const COLS = 7;
-  const rows = [];
-  const merges = [merge(0, 0, 0, COLS - 1)];
-
-  rows.push(titleRow('SPINLYTICS — PACKING LOG', COLS));
-  rows.push(emptyRow(COLS));
-
-  rows.push([
-    sc('Date', S.header), sc('Source', S.header), sc('Yarn Type', S.header),
-    sc('Lot No', S.header), sc('Bags', S.header), sc('KG', S.header), sc('Remarks', S.header),
-  ]);
-
-  let totBags = 0, totKg = 0;
-  (entries || []).forEach(e => {
-    totBags += n(e.bags); totKg += n(e.kgs);
-    rows.push([
-      sc(new Date(e.date).toLocaleDateString('en-IN'), S.cell),
-      sc(e.source, e.source === 'AUTOCORNER' ? S.highlight : S.highlightBlue),
-      sc(e.yarnType, S.cellLeft), sc(e.lotNo, S.cellLeft),
-      sc(n(e.bags), S.cell), sc(n(e.kgs), S.cell),
-      sc(e.remarks || '—', S.cellLeft),
-    ]);
-  });
-
-  rows.push([
-    sc('TOTAL', S.totalRow), sc('', S.totalRow), sc('', S.totalRow), sc('', S.totalRow),
-    sc(totBags, S.totalRow), sc(totKg, S.totalRow), sc('', S.totalRow),
-  ]);
-
-  addSheet(wb, rows, 'Packing Log', [14, 14, 18, 14, 10, 12, 28], merges);
-  download(wb, `SpinLytics_Packing_Log.xlsx`);
-}
-
-// ─────────────────────────────────────────────────────────────
-// REPORT 8: Dispatch Log — Enhanced
+// REPORT: Dispatch Log Report
 // ─────────────────────────────────────────────────────────────
 export function exportDispatchLog(entries) {
   const wb = createWorkbook();
   const COLS = 9;
   const rows = [];
-  const merges = [merge(0, 0, 0, COLS - 1)];
+  const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
 
-  rows.push(titleRow('SPINLYTICS — DISPATCH LOG', COLS));
+  rows.push(titleRow("SPINLYTICS — DISPATCH LOG", COLS));
+  rows.push(
+    subtitleRow(`Generated: ${new Date().toLocaleDateString("en-IN")}`, COLS),
+  );
   rows.push(emptyRow(COLS));
 
-  rows.push([
-    sc('Date', S.header), sc('Material', S.header), sc('Lot No', S.header),
-    sc('Party', S.header), sc('Bags', S.header), sc('KG', S.header),
-    sc('Price/Bag (₹)', S.header), sc('Total Value (₹)', S.headerAmber), sc('Remarks', S.header),
-  ]);
-
-  let totalBags = 0, totalKg = 0, totalValue = 0;
-  (entries || []).forEach(e => {
-    const tv = n(e.totalPrice);
-    totalBags += n(e.bags); totalKg += n(e.kgs); totalValue += tv;
-    rows.push([
-      sc(new Date(e.date).toLocaleDateString('en-IN'), S.cell),
-      sc(e.materialType, S.cellLeft), sc(e.lotNo, S.cellLeft),
-      sc(e.partyName, S.cellLeft), sc(n(e.bags), S.cell), sc(n(e.kgs), S.cell),
-      sc(e.pricePerBag ? n(e.pricePerBag) : '—', S.cell),
-      sc(tv || '—', tv > 0 ? S.highlightAmber : S.cell),
-      sc(e.remarks || '—', S.cellLeft),
-    ]);
+  // Summary by material
+  const matMap = {};
+  (entries || []).forEach((e) => {
+    const mat = e.materialType || "UNKNOWN";
+    if (!matMap[mat])
+      matMap[mat] = { bags: 0, kgs: 0, totalPrice: 0, entries: 0 };
+    matMap[mat].bags += n(e.bags);
+    matMap[mat].kgs += n(e.kgs);
+    matMap[mat].totalPrice += n(e.totalPrice);
+    matMap[mat].entries++;
   });
 
-  rows.push([
-    sc('TOTAL', S.totalRow), sc('', S.totalRow), sc('', S.totalRow), sc('', S.totalRow),
-    sc(totalBags, S.totalRow), sc(totalKg, S.totalRow),
-    sc('', S.totalRow), sc(totalValue || '', S.totalRow), sc('', S.totalRow),
-  ]);
+  if (Object.keys(matMap).length > 0) {
+    rows.push(sectionRow("SUMMARY BY MATERIAL", COLS));
+    merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
+    rows.push([
+      sc("Material", S.header),
+      sc("Entries", S.header),
+      sc("Total Bags", S.header),
+      sc("Total KG", S.header),
+      sc("Total Value (₹)", S.header),
+      ...Array(COLS - 5).fill(sc("", S.header)),
+    ]);
+    Object.entries(matMap)
+      .sort((a, b) => b[1].kgs - a[1].kgs)
+      .forEach(([mat, d]) => {
+        rows.push([
+          sc(mat, S.cellBoldLeft),
+          sc(d.entries, S.cell),
+          sc(d.bags, S.cell),
+          sc(d.kgs, S.cellBold),
+          sc(
+            d.totalPrice > 0 ? d.totalPrice : "—",
+            d.totalPrice > 0 ? S.highlight : S.cell,
+          ),
+          ...Array(COLS - 5).fill(empty()),
+        ]);
+      });
+    const grandBags = Object.values(matMap).reduce((s, d) => s + d.bags, 0);
+    const grandKgs = Object.values(matMap).reduce((s, d) => s + d.kgs, 0);
+    const grandValue = Object.values(matMap).reduce(
+      (s, d) => s + d.totalPrice,
+      0,
+    );
+    rows.push([
+      sc("TOTAL", S.totalRow),
+      sc((entries || []).length, S.totalRow),
+      sc(grandBags, S.totalRow),
+      sc(grandKgs, S.totalRow),
+      sc(grandValue > 0 ? grandValue : "—", S.totalRow),
+      ...Array(COLS - 5).fill(sc("", S.totalRow)),
+    ]);
+    rows.push(emptyRow(COLS));
+  }
 
-  // Party-wise summary
-  rows.push(emptyRow(COLS));
-  rows.push(sectionRow('PARTY-WISE DISPATCH SUMMARY', COLS));
+  // Detail log
+  rows.push(sectionRow("DISPATCH ENTRIES DETAIL", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Party', S.header), sc('Total Bags', S.header), sc('Total KG', S.header), sc('Total Value (₹)', S.header), ...Array(COLS - 4).fill(sc('', S.header))]);
-  const partyMap = {};
-  (entries || []).forEach(e => {
-    if (!partyMap[e.partyName]) partyMap[e.partyName] = { bags: 0, kgs: 0, value: 0 };
-    partyMap[e.partyName].bags += n(e.bags);
-    partyMap[e.partyName].kgs += n(e.kgs);
-    partyMap[e.partyName].value += n(e.totalPrice);
-  });
-  Object.entries(partyMap).sort((a, b) => b[1].kgs - a[1].kgs).forEach(([party, d]) => {
-    rows.push([sc(party, S.cellBoldLeft), sc(d.bags, S.cell), sc(d.kgs, S.cell), sc(d.value || '—', S.cell), ...Array(COLS - 4).fill(empty())]);
+  rows.push([
+    sc("Date", S.header),
+    sc("Material", S.header),
+    sc("Lot No", S.header),
+    sc("Party", S.header),
+    sc("Bags", S.header),
+    sc("KG", S.header),
+    sc("Price/Bag (₹)", S.header),
+    sc("Total Value (₹)", S.header),
+    sc("Remarks", S.header),
+  ]);
+
+  (entries || []).forEach((e) => {
+    rows.push([
+      sc(new Date(e.date).toLocaleDateString("en-IN"), S.cell),
+      sc(e.materialType, S.cellBoldLeft),
+      sc(e.lotNo || "—", S.cellLeft),
+      sc(e.partyName || "—", S.cellLeft),
+      sc(n(e.bags), S.cell),
+      sc(n(e.kgs), S.cellBold),
+      sc(e.pricePerBag ? n(e.pricePerBag) : "—", S.cell),
+      sc(
+        e.totalPrice ? n(e.totalPrice) : "—",
+        e.totalPrice ? S.highlight : S.cell,
+      ),
+      sc(e.remarks || "—", S.cellLeft),
+    ]);
   });
 
-  addSheet(wb, rows, 'Dispatch Log', [14, 14, 14, 22, 10, 12, 14, 16, 28], merges);
-  download(wb, `SpinLytics_Dispatch_Log.xlsx`);
+  addSheet(
+    wb,
+    rows,
+    "Dispatch Log",
+    [14, 14, 14, 20, 10, 12, 14, 16, 28],
+    merges,
+  );
+  download(
+    wb,
+    `SpinLytics_Dispatch_Log_${new Date().toISOString().split("T")[0]}.xlsx`,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
-// REPORT 9: EB (Energy) Report — Enhanced
+// REPORT: Packing Log Report
 // ─────────────────────────────────────────────────────────────
-export function exportEBReport(entries) {
+export function exportPackingLog(entries) {
   const wb = createWorkbook();
-  const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const COLS = 6;
+  const COLS = 7;
   const rows = [];
-  const merges = [merge(0, 0, 0, COLS - 1)];
+  const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
 
-  rows.push(titleRow('SPINLYTICS — EB (ENERGY) REPORT', COLS));
+  rows.push(titleRow("SPINLYTICS — PACKING LOG", COLS));
+  rows.push(
+    subtitleRow(`Generated: ${new Date().toLocaleDateString("en-IN")}`, COLS),
+  );
   rows.push(emptyRow(COLS));
 
-  rows.push([
-    sc('Month', S.header), sc('Year', S.header), sc('Opening Units', S.header),
-    sc('Closing Units', S.header), sc('Units Consumed', S.headerAmber), sc('Change vs Prev', S.header),
-  ]);
-
-  let totalConsumed = 0;
-  let prevConsumed = null;
-  (entries || []).forEach(e => {
-    const consumed = n(e.closingUnits) - n(e.openingUnits);
-    totalConsumed += consumed;
-    const change = prevConsumed !== null ? consumed - prevConsumed : null;
-    const changeStr = change !== null ? (change > 0 ? `+${change.toFixed(0)}` : change.toFixed(0)) : '—';
-    const changeStyle = change === null ? S.cell : (change > 0 ? S.warning : S.highlight);
-    rows.push([
-      sc(MONTHS[e.month] || e.month, S.cellBoldLeft), sc(e.year, S.cell),
-      sc(n(e.openingUnits), S.cell), sc(n(e.closingUnits), S.cell),
-      sc(consumed, S.highlightAmber), sc(changeStr, changeStyle),
-    ]);
-    prevConsumed = consumed;
+  // Summary by source
+  const sourceMap = {};
+  (entries || []).forEach((e) => {
+    const src = e.source || "UNKNOWN";
+    if (!sourceMap[src]) sourceMap[src] = { bags: 0, kgs: 0, entries: 0 };
+    sourceMap[src].bags += n(e.bags);
+    sourceMap[src].kgs += n(e.kgs);
+    sourceMap[src].entries++;
   });
 
-  rows.push([
-    sc('TOTAL', S.totalRow), sc('', S.totalRow), sc('', S.totalRow),
-    sc('', S.totalRow), sc(totalConsumed, S.totalRow), sc('', S.totalRow),
-  ]);
+  if (Object.keys(sourceMap).length > 0) {
+    rows.push(sectionRow("SUMMARY BY SOURCE", COLS));
+    merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
+    rows.push([
+      sc("Source", S.header),
+      sc("Entries", S.header),
+      sc("Total Bags", S.header),
+      sc("Total KG", S.header),
+      ...Array(COLS - 4).fill(sc("", S.header)),
+    ]);
+    Object.entries(sourceMap).forEach(([src, d]) => {
+      rows.push([
+        sc(src, S.cellBoldLeft),
+        sc(d.entries, S.cell),
+        sc(d.bags, S.cell),
+        sc(d.kgs, S.cellBold),
+        ...Array(COLS - 4).fill(empty()),
+      ]);
+    });
+    const grandBags = Object.values(sourceMap).reduce((s, d) => s + d.bags, 0);
+    const grandKgs = Object.values(sourceMap).reduce((s, d) => s + d.kgs, 0);
+    rows.push([
+      sc("TOTAL", S.totalRow),
+      sc((entries || []).length, S.totalRow),
+      sc(grandBags, S.totalRow),
+      sc(grandKgs, S.totalRow),
+      ...Array(COLS - 4).fill(sc("", S.totalRow)),
+    ]);
+    rows.push(emptyRow(COLS));
+  }
 
-  // Summary stats
-  rows.push(emptyRow(COLS));
-  rows.push(sectionRow('SUMMARY STATISTICS', COLS));
+  // Detail log
+  rows.push(sectionRow("PACKING ENTRIES DETAIL", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  const count = (entries || []).length;
-  const avg = count > 0 ? totalConsumed / count : 0;
-  rows.push([sc('Total Consumed', S.cellBoldLeft), sc(totalConsumed, S.highlightAmber), sc('units', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Monthly Average', S.cellBoldLeft), sc(avg.toFixed(0), S.cell), sc('units/month', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Months Recorded', S.cellBoldLeft), sc(count, S.cell), empty(), ...Array(COLS - 3).fill(empty())]);
-
-  addSheet(wb, rows, 'EB Report', [14, 8, 16, 16, 18, 16], merges);
-  download(wb, `SpinLytics_EB_Report.xlsx`);
-}
-
-// ─────────────────────────────────────────────────────────────
-// REPORT 10: Material-wise Stock Movement
-// ─────────────────────────────────────────────────────────────
-export function exportMaterialMovement(stockData) {
-  const wb = createWorkbook();
-  const COLS = 8;
-  const rows = [];
-  const merges = [merge(0, 0, 0, COLS - 1)];
-  const { recentTransactions = [] } = stockData || {};
-
-  rows.push(titleRow('SPINLYTICS — MATERIAL-WISE STOCK MOVEMENT', COLS));
-  rows.push(emptyRow(COLS));
-
-  // Group transactions by material
-  const materialGroups = {};
-  recentTransactions.forEach(t => {
-    if (!materialGroups[t.materialType]) materialGroups[t.materialType] = { purchase: 0, issue: 0, dispatch: 0, ret: 0, bags: 0 };
-    const kgs = n(t.kgs);
-    const bags = n(t.bags);
-    materialGroups[t.materialType].bags += bags;
-    switch (t.transactionType) {
-      case 'PURCHASE': materialGroups[t.materialType].purchase += kgs; break;
-      case 'ISSUE': materialGroups[t.materialType].issue += kgs; break;
-      case 'DISPATCH': materialGroups[t.materialType].dispatch += kgs; break;
-      case 'RETURN': materialGroups[t.materialType].ret += kgs; break;
-    }
-  });
-
   rows.push([
-    sc('Material', S.header), sc('Purchase (kg)', S.header), sc('Issue (kg)', S.headerBlue),
-    sc('Dispatch (kg)', S.headerPurple), sc('Return (kg)', S.header),
-    sc('Net Inflow (kg)', S.headerAmber), sc('Total Bags', S.header), sc('Status', S.header),
+    sc("Date", S.header),
+    sc("Source", S.header),
+    sc("Yarn Type", S.header),
+    sc("Lot No", S.header),
+    sc("Bags", S.header),
+    sc("KG", S.header),
+    sc("Remarks", S.header),
   ]);
 
-  Object.entries(materialGroups).forEach(([mat, d]) => {
-    const net = d.purchase + d.ret - d.issue - d.dispatch;
+  (entries || []).forEach((e) => {
+    const isConer = e.source === "AUTOCONER";
     rows.push([
-      sc(mat, S.cellBoldLeft), sc(d.purchase, S.highlight), sc(d.issue, S.cell),
-      sc(d.dispatch, S.cell), sc(d.ret, S.cell),
-      sc(net, net >= 0 ? S.highlight : S.warning), sc(d.bags, S.cell),
-      sc(net >= 0 ? 'Net Positive' : 'Net Negative', net >= 0 ? S.highlight : S.warning),
+      sc(new Date(e.date).toLocaleDateString("en-IN"), S.cell),
+      sc(e.source, isConer ? S.highlight : S.highlightBlue),
+      sc(e.yarnType || "—", S.cellLeft),
+      sc(e.lotNo || "—", S.cellLeft),
+      sc(n(e.bags), S.cell),
+      sc(n(e.kgs), S.cellBold),
+      sc(e.remarks || "—", S.cellLeft),
     ]);
   });
 
-  addSheet(wb, rows, 'Material Movement', [14, 16, 14, 16, 14, 16, 12, 14], merges);
-  download(wb, `SpinLytics_Material_Movement.xlsx`);
+  addSheet(wb, rows, "Packing Log", [14, 14, 16, 14, 10, 12, 28], merges);
+  download(
+    wb,
+    `SpinLytics_Packing_Log_${new Date().toISOString().split("T")[0]}.xlsx`,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
-// REPORT 11: Loss Analysis Report
+// REPORT 11: Count-wise Production Analysis (2026 Standard)
 // ─────────────────────────────────────────────────────────────
 export function exportLossAnalysis(entries) {
   const wb = createWorkbook();
@@ -919,293 +1669,570 @@ export function exportLossAnalysis(entries) {
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1)];
 
-  rows.push(titleRow('SPINLYTICS — LOSS ANALYSIS REPORT', COLS));
+  rows.push(
+    titleRow("SPINLYTICS — COUNT-WISE PRODUCTION ANALYSIS (2026)", COLS),
+  );
   rows.push(emptyRow(COLS));
 
-  rows.push([
-    sc('Date', S.header), sc('Frame', S.header),
-    sc('Production (kg)', S.header), sc('Autocorner (kg)', S.header), sc('Packing (kg)', S.header),
-    sc('Spin Loss (kg)', S.headerBlue), sc('Spin Loss %', S.headerBlue),
-    sc('Auto Loss (kg)', S.headerPurple), sc('Auto Loss %', S.headerPurple),
-    sc('Total Loss (kg)', S.headerRed),
-  ]);
-
-  let totSLoss = 0, totALoss = 0;
-  (entries || []).forEach(e => {
-    const prod = n(e.productionKg);
-    const auto = n(e.autocornerProductionKg);
-    const pack = n(e.packingKg);
-    const sLoss = prod - auto;
-    const aLoss = auto - pack;
-    const sLossPct = prod > 0 ? (sLoss / prod * 100) : 0;
-    const aLossPct = auto > 0 ? (aLoss / auto * 100) : 0;
-    totSLoss += sLoss; totALoss += aLoss;
-    rows.push([
-      sc(new Date(e.date).toLocaleDateString('en-IN'), S.cell),
-      sc(e.frameNumber === 'FRAME_41' ? 'F41' : 'F47', S.cellBold),
-      sc(prod, S.cell), sc(auto, S.cell), sc(pack, S.cell),
-      sc(sLoss, S.cell), sc(sLossPct.toFixed(2), sLossPct > 5 ? S.warning : S.cell),
-      sc(aLoss, S.cell), sc(aLossPct.toFixed(2), aLossPct > 5 ? S.warning : S.cell),
-      sc(sLoss + aLoss, S.warning),
-    ]);
+  // Group entries by count
+  const countMap = {};
+  (entries || []).forEach((e) => {
+    const c = e.calculated || {};
+    const count = e.count || "Unknown";
+    if (!countMap[count])
+      countMap[count] = {
+        grossKgs: 0,
+        netKgs: 0,
+        wasteKgs: 0,
+        actualHK: 0,
+        stdHK: 0,
+        entries: 0,
+      };
+    countMap[count].grossKgs += n(c.productionKgsGross);
+    countMap[count].netKgs += n(c.actualProductionKgs);
+    countMap[count].wasteKgs += n(e.wasteKgs);
+    countMap[count].actualHK += n(e.actualHK);
+    countMap[count].stdHK += n(e.stdHK);
+    countMap[count].entries++;
   });
 
+  rows.push(sectionRow("COUNT-WISE PRODUCTION OVERVIEW", COLS));
+  merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
   rows.push([
-    sc('TOTAL', S.totalRow), sc('', S.totalRow), sc('', S.totalRow), sc('', S.totalRow), sc('', S.totalRow),
-    sc(totSLoss, S.totalRow), sc('', S.totalRow),
-    sc(totALoss, S.totalRow), sc('', S.totalRow),
-    sc(totSLoss + totALoss, S.totalRow),
+    sc("Count", S.header),
+    sc("Entries", S.header),
+    sc("Gross (kg)", S.header),
+    sc("Net (kg)", S.header),
+    sc("Waste (kg)", S.headerAmber),
+    sc("Waste %", S.headerAmber),
+    sc("Avg Eff %", S.headerBlue),
+    sc("Share of Total", S.header),
+    ...Array(COLS - 8).fill(sc("", S.header)),
   ]);
 
-  addSheet(wb, rows, 'Loss Analysis', [14, 6, 16, 16, 14, 14, 12, 14, 12, 16], merges);
-  download(wb, `SpinLytics_Loss_Analysis.xlsx`);
+  const grandGross = Object.values(countMap).reduce(
+    (s, c) => s + c.grossKgs,
+    0,
+  );
+
+  Object.entries(countMap)
+    .sort((a, b) => b[1].grossKgs - a[1].grossKgs)
+    .forEach(([count, d]) => {
+      const wastePct =
+        d.grossKgs > 0 ? ((d.wasteKgs / d.grossKgs) * 100).toFixed(2) : "0";
+      const effPct =
+        d.stdHK > 0 ? ((d.actualHK / d.stdHK) * 100).toFixed(2) : "0";
+      const share =
+        grandGross > 0 ? ((d.grossKgs / grandGross) * 100).toFixed(1) : "0";
+      rows.push([
+        sc(count, S.cellBold),
+        sc(d.entries, S.cell),
+        sc(d.grossKgs, S.cell),
+        sc(d.netKgs, S.cell),
+        sc(d.wasteKgs, S.cell),
+        sc(wastePct, n(wastePct) > 5 ? S.warning : S.cell),
+        sc(effPct, n(effPct) < 80 ? S.warning : S.highlight),
+        sc(`${share}%`, S.cell),
+        ...Array(COLS - 8).fill(empty()),
+      ]);
+    });
+
+  addSheet(
+    wb,
+    rows,
+    "Count Analysis",
+    [10, 10, 14, 14, 14, 12, 12, 14, 10, 10],
+    merges,
+  );
+  download(wb, `SpinLytics_Count_Analysis.xlsx`);
 }
 
 // ─────────────────────────────────────────────────────────────
-// REPORT 12: Weekly Production Summary
+// REPORT 12: Weekly Production Summary (2026 Standard)
 // ─────────────────────────────────────────────────────────────
 export function exportWeeklyProduction(entries, dateRange) {
   const wb = createWorkbook();
-  const COLS = 12;
+  const COLS = 10;
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
 
-  rows.push(titleRow('SPINLYTICS — WEEKLY PRODUCTION SUMMARY', COLS));
-  rows.push(subtitleRow(dateRange || 'All Data', COLS));
+  rows.push(titleRow("SPINLYTICS — WEEKLY PRODUCTION SUMMARY (2026)", COLS));
+  rows.push(subtitleRow(dateRange || "All Data", COLS));
   rows.push(emptyRow(COLS));
 
   // Group entries by week
   const weekMap = {};
-  (entries || []).forEach(e => {
+  (entries || []).forEach((e) => {
+    const c = e.calculated || {};
     const d = new Date(e.date);
     const startOfYear = new Date(d.getFullYear(), 0, 1);
-    const weekNo = Math.ceil(((d - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+    const weekNo = Math.ceil(
+      ((d - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7,
+    );
     const key = `W${weekNo} (${d.getFullYear()})`;
-    if (!weekMap[key]) weekMap[key] = { prod: 0, auto: 0, pack: 0, eb: 0, spindles: 0, days: new Set(), entries: 0 };
-    weekMap[key].prod += n(e.productionKg);
-    weekMap[key].auto += n(e.autocornerProductionKg);
-    weekMap[key].pack += n(e.packingKg);
-    weekMap[key].eb += n(e.ebUnits);
-    weekMap[key].spindles += e.noOfSpindles;
+    if (!weekMap[key])
+      weekMap[key] = {
+        grossKgs: 0,
+        netKgs: 0,
+        wasteKgs: 0,
+        actualHK: 0,
+        stdHK: 0,
+        days: new Set(),
+        entries: 0,
+      };
+    weekMap[key].grossKgs += n(c.productionKgsGross);
+    weekMap[key].netKgs += n(c.actualProductionKgs);
+    weekMap[key].wasteKgs += n(e.wasteKgs);
+    weekMap[key].actualHK += n(e.actualHK);
+    weekMap[key].stdHK += n(e.stdHK);
     weekMap[key].days.add(new Date(e.date).toDateString());
     weekMap[key].entries++;
   });
 
-  rows.push(sectionRow('WEEKLY BREAKDOWN', COLS));
+  rows.push(sectionRow("WEEKLY BREAKDOWN", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
   rows.push([
-    sc('Week', S.header), sc('Days', S.header), sc('Entries', S.header),
-    sc('Production (kg)', S.header), sc('Autocorner (kg)', S.header), sc('Packing (kg)', S.header),
-    sc('Spin Loss (kg)', S.headerBlue), sc('Spin Loss %', S.headerBlue),
-    sc('EB Units', S.headerAmber), sc('UKG', S.headerPurple),
-    sc('Avg Prod/Day', S.header), sc('Overall Yield %', S.header),
+    sc("Week", S.header),
+    sc("Days", S.header),
+    sc("Entries", S.header),
+    sc("Gross (kg)", S.header),
+    sc("Net (kg)", S.header),
+    sc("Waste (kg)", S.headerAmber),
+    sc("Waste %", S.headerAmber),
+    sc("Avg Eff %", S.headerBlue),
+    sc("Avg Prod/Day", S.header),
+    sc("Net Yield %", S.header),
   ]);
 
-  let totProd = 0, totAuto = 0, totPack = 0, totEB = 0;
+  let totGross = 0,
+    totNet = 0,
+    totWaste = 0;
   Object.entries(weekMap).forEach(([week, d]) => {
-    const spinLoss = d.prod - d.auto;
-    const spinLossPct = d.prod > 0 ? (spinLoss / d.prod * 100).toFixed(2) : 0;
-    const ukg = d.prod > 0 ? (d.eb / d.prod).toFixed(4) : '—';
-    const yieldPct = d.prod > 0 ? ((d.pack / d.prod) * 100).toFixed(1) : '0';
-    const avgProdDay = d.days.size > 0 ? (d.prod / d.days.size).toFixed(1) : '0';
-    totProd += d.prod; totAuto += d.auto; totPack += d.pack; totEB += d.eb;
+    const wastePct =
+      d.grossKgs > 0 ? ((d.wasteKgs / d.grossKgs) * 100).toFixed(2) : "0";
+    const effPct =
+      d.stdHK > 0 ? ((d.actualHK / d.stdHK) * 100).toFixed(2) : "0";
+    const yieldPct =
+      d.grossKgs > 0 ? ((d.netKgs / d.grossKgs) * 100).toFixed(1) : "0";
+    const avgProdDay =
+      d.days.size > 0 ? (d.grossKgs / d.days.size).toFixed(1) : "0";
+    totGross += d.grossKgs;
+    totNet += d.netKgs;
+    totWaste += d.wasteKgs;
     rows.push([
-      sc(week, S.cellBoldLeft), sc(d.days.size, S.cell), sc(d.entries, S.cell),
-      sc(d.prod, S.cellBold), sc(d.auto, S.cell), sc(d.pack, S.cell),
-      sc(spinLoss, S.cell), sc(spinLossPct, n(spinLossPct) > 5 ? S.warning : S.cell),
-      sc(d.eb, S.highlightAmber), sc(ukg, S.cell),
-      sc(avgProdDay, S.highlight), sc(yieldPct, S.cell),
+      sc(week, S.cellBoldLeft),
+      sc(d.days.size, S.cell),
+      sc(d.entries, S.cell),
+      sc(d.grossKgs, S.cellBold),
+      sc(d.netKgs, S.cell),
+      sc(d.wasteKgs, S.cell),
+      sc(wastePct, n(wastePct) > 5 ? S.warning : S.cell),
+      sc(effPct, S.highlight),
+      sc(avgProdDay, S.highlight),
+      sc(yieldPct, S.cell),
     ]);
   });
 
   rows.push([
-    sc('TOTAL', S.totalRow), sc('', S.totalRow), sc('', S.totalRow),
-    sc(totProd, S.totalRow), sc(totAuto, S.totalRow), sc(totPack, S.totalRow),
-    sc(totProd - totAuto, S.totalRow), sc('', S.totalRow),
-    sc(totEB, S.totalRow), sc(totProd > 0 ? (totEB / totProd).toFixed(4) : '', S.totalRow),
-    sc('', S.totalRow), sc(totProd > 0 ? ((totPack / totProd) * 100).toFixed(1) : '', S.totalRow),
+    sc("TOTAL", S.totalRow),
+    sc("", S.totalRow),
+    sc("", S.totalRow),
+    sc(totGross, S.totalRow),
+    sc(totNet, S.totalRow),
+    sc(totWaste, S.totalRow),
+    sc(
+      totGross > 0 ? ((totWaste / totGross) * 100).toFixed(2) + "%" : "",
+      S.totalRow,
+    ),
+    ...Array(COLS - 7).fill(sc("", S.totalRow)),
   ]);
 
   rows.push(emptyRow(COLS));
-  rows.push(sectionRow(`Report generated: ${new Date().toLocaleString('en-IN')}`, COLS));
+  rows.push(
+    sectionRow(`Report generated: ${new Date().toLocaleString("en-IN")}`, COLS),
+  );
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
 
-  addSheet(wb, rows, 'Weekly Summary', [16, 8, 8, 16, 16, 14, 14, 12, 12, 10, 14, 14], merges);
+  addSheet(
+    wb,
+    rows,
+    "Weekly Summary",
+    [16, 8, 8, 14, 14, 14, 12, 12, 14, 12],
+    merges,
+  );
   download(wb, `SpinLytics_Weekly_Production.xlsx`);
 }
 
 // ─────────────────────────────────────────────────────────────
-// REPORT 13: Monthly Day-wise Detailed Report
+// REPORT 13: Monthly Day-wise Detailed Report (2026 Standard)
 // ─────────────────────────────────────────────────────────────
 export function exportMonthlyDaywise(data, prodEntries) {
   const wb = createWorkbook();
-  const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const COLS = 14;
+  const MONTHS = [
+    "",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const COLS = 10;
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
 
-  rows.push(titleRow('SPINLYTICS — MONTHLY DAY-WISE PRODUCTION', COLS));
+  rows.push(titleRow("SPINLYTICS — MONTHLY DAY-WISE PRODUCTION (2026)", COLS));
   rows.push(subtitleRow(`${MONTHS[data.month]} ${data.year}`, COLS));
   rows.push(emptyRow(COLS));
 
-  // Aggregate by day
+  // Aggregate by day from shift production entries
   const dayMap = {};
-  (prodEntries || []).forEach(e => {
+  (prodEntries || []).forEach((e) => {
+    const c = e.calculated || {};
     const day = new Date(e.date).getDate();
-    if (!dayMap[day]) dayMap[day] = { prod: 0, auto: 0, pack: 0, eb: 0, spindles: 0, frames: [] };
-    dayMap[day].prod += n(e.productionKg);
-    dayMap[day].auto += n(e.autocornerProductionKg);
-    dayMap[day].pack += n(e.packingKg);
-    dayMap[day].eb += n(e.ebUnits);
-    dayMap[day].spindles += e.noOfSpindles;
-    dayMap[day].frames.push(e.frameNumber === 'FRAME_41' ? 'F41' : 'F47');
+    if (!dayMap[day])
+      dayMap[day] = {
+        grossKgs: 0,
+        netKgs: 0,
+        wasteKgs: 0,
+        actualHK: 0,
+        stdHK: 0,
+        counts: new Set(),
+        entries: 0,
+      };
+    dayMap[day].grossKgs += n(c.productionKgsGross);
+    dayMap[day].netKgs += n(c.actualProductionKgs);
+    dayMap[day].wasteKgs += n(e.wasteKgs);
+    dayMap[day].actualHK += n(e.actualHK);
+    dayMap[day].stdHK += n(e.stdHK);
+    dayMap[day].counts.add(e.count);
+    dayMap[day].entries++;
   });
 
-  rows.push(sectionRow('DAY-BY-DAY PRODUCTION DATA', COLS));
+  rows.push(sectionRow("DAY-BY-DAY PRODUCTION DATA", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
   rows.push([
-    sc('Day', S.header), sc('Frames', S.header),
-    sc('Production (kg)', S.header), sc('Autocorner (kg)', S.header), sc('Packing (kg)', S.header),
-    sc('Spin Loss (kg)', S.headerBlue), sc('Spin Loss %', S.headerBlue),
-    sc('Auto Loss (kg)', S.headerPurple), sc('Auto Loss %', S.headerPurple),
-    sc('Total Loss (kg)', S.headerRed), sc('EB Units', S.headerAmber),
-    sc('UKG', S.header), sc('GPS', S.header), sc('Yield %', S.header),
+    sc("Day", S.header),
+    sc("Counts", S.header),
+    sc("Entries", S.header),
+    sc("Gross (kg)", S.header),
+    sc("Net (kg)", S.header),
+    sc("Waste (kg)", S.headerAmber),
+    sc("Waste %", S.headerAmber),
+    sc("Avg Eff %", S.headerBlue),
+    sc("Avg Prod/Entry", S.header),
+    sc("Net Yield %", S.header),
   ]);
 
-  let totP = 0, totA = 0, totPk = 0, totEB = 0;
+  let totGross = 0,
+    totNet = 0,
+    totWaste = 0,
+    totActHK = 0,
+    totStdHK = 0;
   const lastDay = new Date(data.year, data.month, 0).getDate();
   for (let d = 1; d <= lastDay; d++) {
     const day = dayMap[d];
     if (!day) {
-      rows.push([sc(d, S.cell), sc('—', S.cell), ...Array(COLS - 2).fill(sc('—', S.cell))]);
+      rows.push([
+        sc(d, S.cell),
+        sc("—", S.cell),
+        ...Array(COLS - 2).fill(sc("—", S.cell)),
+      ]);
       continue;
     }
-    const sL = day.prod - day.auto;
-    const aL = day.auto - day.pack;
-    const sLP = day.prod > 0 ? (sL / day.prod * 100).toFixed(2) : 0;
-    const aLP = day.auto > 0 ? (aL / day.auto * 100).toFixed(2) : 0;
-    const ukg = day.prod > 0 ? (day.eb / day.prod).toFixed(4) : '—';
-    const gps = day.spindles > 0 ? (day.prod / day.spindles).toFixed(4) : '—';
-    const yld = day.prod > 0 ? ((day.pack / day.prod) * 100).toFixed(1) : '0';
-    totP += day.prod; totA += day.auto; totPk += day.pack; totEB += day.eb;
+    const wastePct =
+      day.grossKgs > 0 ? ((day.wasteKgs / day.grossKgs) * 100).toFixed(2) : "0";
+    const effPct =
+      day.stdHK > 0 ? ((day.actualHK / day.stdHK) * 100).toFixed(2) : "0";
+    const yieldPct =
+      day.grossKgs > 0 ? ((day.netKgs / day.grossKgs) * 100).toFixed(1) : "0";
+    const avgProd =
+      day.entries > 0 ? (day.grossKgs / day.entries).toFixed(2) : "0";
+    totGross += day.grossKgs;
+    totNet += day.netKgs;
+    totWaste += day.wasteKgs;
+    totActHK += day.actualHK;
+    totStdHK += day.stdHK;
     rows.push([
-      sc(d, S.cellBold), sc(day.frames.join(', '), S.cell),
-      sc(day.prod, S.cellBold), sc(day.auto, S.cell), sc(day.pack, S.cell),
-      sc(sL, S.cell), sc(sLP, n(sLP) > 5 ? S.warning : S.cell),
-      sc(aL, S.cell), sc(aLP, n(aLP) > 5 ? S.warning : S.cell),
-      sc(sL + aL, S.warning), sc(day.eb, S.highlightAmber),
-      sc(ukg, S.cell), sc(gps, S.highlight), sc(yld, S.cell),
+      sc(d, S.cellBold),
+      sc(Array.from(day.counts).join(", "), S.cell),
+      sc(day.entries, S.cell),
+      sc(day.grossKgs, S.cellBold),
+      sc(day.netKgs, S.cell),
+      sc(day.wasteKgs, S.cell),
+      sc(wastePct, n(wastePct) > 5 ? S.warning : S.cell),
+      sc(effPct, n(effPct) < 80 ? S.warning : S.highlight),
+      sc(avgProd, S.cell),
+      sc(yieldPct, S.cell),
     ]);
   }
 
+  const grandEffPct =
+    totStdHK > 0 ? ((totActHK / totStdHK) * 100).toFixed(2) : "0";
   rows.push([
-    sc('TOTAL', S.totalRow), sc('', S.totalRow),
-    sc(totP, S.totalRow), sc(totA, S.totalRow), sc(totPk, S.totalRow),
-    sc(totP - totA, S.totalRow), sc('', S.totalRow),
-    sc(totA - totPk, S.totalRow), sc('', S.totalRow),
-    sc(totP - totPk, S.totalRow), sc(totEB, S.totalRow),
-    sc(totP > 0 ? (totEB / totP).toFixed(4) : '', S.totalRow),
-    sc('', S.totalRow),
-    sc(totP > 0 ? ((totPk / totP) * 100).toFixed(1) : '', S.totalRow),
+    sc("TOTAL", S.totalRow),
+    sc("", S.totalRow),
+    sc("", S.totalRow),
+    sc(totGross, S.totalRow),
+    sc(totNet, S.totalRow),
+    sc(totWaste, S.totalRow),
+    sc(
+      totGross > 0 ? ((totWaste / totGross) * 100).toFixed(2) + "%" : "",
+      S.totalRow,
+    ),
+    sc(`${grandEffPct}%`, S.totalRow),
+    ...Array(COLS - 8).fill(sc("", S.totalRow)),
   ]);
 
   rows.push(emptyRow(COLS));
 
   // Summary statistics
   const activeDays = Object.keys(dayMap).length;
-  rows.push(sectionRow('MONTHLY SUMMARY', COLS));
+  rows.push(sectionRow("MONTHLY SUMMARY", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Metric', S.headerAmber), sc('Value', S.headerAmber), sc('Unit', S.headerAmber), ...Array(COLS - 3).fill(sc('', S.headerAmber))]);
-  rows.push([sc('Active Production Days', S.cellBoldLeft), sc(activeDays, S.highlight), sc('days', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Total Calendar Days', S.cellBoldLeft), sc(lastDay, S.cell), sc('days', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Utilization', S.cellBoldLeft), sc(((activeDays / lastDay) * 100).toFixed(0), S.highlightBlue), sc('%', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Avg Daily Production', S.cellBoldLeft), sc(activeDays > 0 ? (totP / activeDays).toFixed(1) : 0, S.highlight), sc('kg/day', S.cell), ...Array(COLS - 3).fill(empty())]);
-  rows.push([sc('Avg Daily EB', S.cellBoldLeft), sc(activeDays > 0 ? (totEB / activeDays).toFixed(0) : 0, S.highlightAmber), sc('units/day', S.cell), ...Array(COLS - 3).fill(empty())]);
+  rows.push([
+    sc("Metric", S.headerAmber),
+    sc("Value", S.headerAmber),
+    sc("Unit", S.headerAmber),
+    ...Array(COLS - 3).fill(sc("", S.headerAmber)),
+  ]);
+  rows.push([
+    sc("Active Production Days", S.cellBoldLeft),
+    sc(activeDays, S.highlight),
+    sc("days", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Total Calendar Days", S.cellBoldLeft),
+    sc(lastDay, S.cell),
+    sc("days", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Utilization", S.cellBoldLeft),
+    sc(((activeDays / lastDay) * 100).toFixed(0), S.highlightBlue),
+    sc("%", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Avg Daily Production", S.cellBoldLeft),
+    sc(activeDays > 0 ? (totGross / activeDays).toFixed(1) : 0, S.highlight),
+    sc("kg/day", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
+  rows.push([
+    sc("Avg Efficiency", S.cellBoldLeft),
+    sc(grandEffPct, S.highlight),
+    sc("%", S.cell),
+    ...Array(COLS - 3).fill(empty()),
+  ]);
 
   // Best/worst day
   const dayEntries = Object.entries(dayMap);
   if (dayEntries.length > 1) {
-    const sorted = [...dayEntries].sort((a, b) => b[1].prod - a[1].prod);
+    const sorted = [...dayEntries].sort(
+      (a, b) => b[1].grossKgs - a[1].grossKgs,
+    );
     rows.push(emptyRow(COLS));
-    rows.push([sc('Best Day (Production)', S.cellBoldLeft), sc(`Day ${sorted[0][0]}`, S.highlight), sc(`${sorted[0][1].prod.toFixed(0)} kg`, S.cell), ...Array(COLS - 3).fill(empty())]);
-    rows.push([sc('Lowest Day (Production)', S.cellBoldLeft), sc(`Day ${sorted[sorted.length - 1][0]}`, S.highlightAmber), sc(`${sorted[sorted.length - 1][1].prod.toFixed(0)} kg`, S.cell), ...Array(COLS - 3).fill(empty())]);
+    rows.push([
+      sc("Best Day (Production)", S.cellBoldLeft),
+      sc(`Day ${sorted[0][0]}`, S.highlight),
+      sc(`${sorted[0][1].grossKgs.toFixed(1)} kg`, S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
+    rows.push([
+      sc("Lowest Day (Production)", S.cellBoldLeft),
+      sc(`Day ${sorted[sorted.length - 1][0]}`, S.highlightAmber),
+      sc(`${sorted[sorted.length - 1][1].grossKgs.toFixed(1)} kg`, S.cell),
+      ...Array(COLS - 3).fill(empty()),
+    ]);
   }
 
   rows.push(emptyRow(COLS));
-  rows.push(sectionRow(`Report generated: ${new Date().toLocaleString('en-IN')}`, COLS));
+  rows.push(
+    sectionRow(`Report generated: ${new Date().toLocaleString("en-IN")}`, COLS),
+  );
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
 
-  addSheet(wb, rows, 'Day-wise Production', [6, 10, 16, 16, 14, 14, 12, 14, 12, 14, 12, 10, 10, 10], merges);
-  download(wb, `SpinLytics_Monthly_Daywise_${MONTHS[data.month]}_${data.year}.xlsx`);
+  addSheet(
+    wb,
+    rows,
+    "Day-wise Production",
+    [6, 14, 8, 14, 14, 14, 12, 12, 14, 12],
+    merges,
+  );
+  download(
+    wb,
+    `SpinLytics_Monthly_Daywise_${MONTHS[data.month]}_${data.year}.xlsx`,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
-// REPORT 14: Frame Comparison Report
+// REPORT 14: Count Comparison Report (2026 Standard)
 // ─────────────────────────────────────────────────────────────
-export function exportFrameComparison(entries, dateRange) {
+export function exportCountComparison(entries, dateRange) {
   const wb = createWorkbook();
   const COLS = 9;
   const rows = [];
   const merges = [merge(0, 0, 0, COLS - 1), merge(1, 0, 1, COLS - 1)];
 
-  rows.push(titleRow('SPINLYTICS — FRAME COMPARISON REPORT', COLS));
-  rows.push(subtitleRow(dateRange || 'All Data', COLS));
+  rows.push(titleRow("SPINLYTICS — COUNT COMPARISON REPORT (2026)", COLS));
+  rows.push(subtitleRow(dateRange || "All Data", COLS));
   rows.push(emptyRow(COLS));
 
-  // Split entries by frame
-  const f41 = { prod: 0, auto: 0, pack: 0, eb: 0, spindles: 0, count: 0 };
-  const f47 = { prod: 0, auto: 0, pack: 0, eb: 0, spindles: 0, count: 0 };
-  (entries || []).forEach(e => {
-    const target = e.frameNumber === 'FRAME_41' ? f41 : f47;
-    target.prod += n(e.productionKg);
-    target.auto += n(e.autocornerProductionKg);
-    target.pack += n(e.packingKg);
-    target.eb += n(e.ebUnits);
-    target.spindles += e.noOfSpindles;
-    target.count++;
+  // Group entries by count
+  const countMap = {};
+  (entries || []).forEach((e) => {
+    const c = e.calculated || {};
+    const count = e.count || "Unknown";
+    if (!countMap[count])
+      countMap[count] = {
+        grossKgs: 0,
+        netKgs: 0,
+        wasteKgs: 0,
+        actualHK: 0,
+        stdHK: 0,
+        entries: 0,
+      };
+    countMap[count].grossKgs += n(c.productionKgsGross);
+    countMap[count].netKgs += n(c.actualProductionKgs);
+    countMap[count].wasteKgs += n(e.wasteKgs);
+    countMap[count].actualHK += n(e.actualHK);
+    countMap[count].stdHK += n(e.stdHK);
+    countMap[count].entries++;
   });
 
-  rows.push(sectionRow('FRAME COMPARISON OVERVIEW', COLS));
+  const grandGross = Object.values(countMap).reduce(
+    (s, c) => s + c.grossKgs,
+    0,
+  );
+  const counts = Object.keys(countMap).sort();
+
+  rows.push(sectionRow("COUNT COMPARISON OVERVIEW", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Metric', S.header), sc('Frame 41', S.header), sc('Frame 47', S.header), sc('Total', S.header), sc('F41 Share %', S.headerBlue), sc('F47 Share %', S.headerPurple), sc('Better', S.header), ...Array(COLS - 7).fill(sc('', S.header))]);
+  rows.push([
+    sc("Metric", S.header),
+    ...counts.map((c) => sc(c, S.header)),
+    sc("Total", S.header),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(sc("", S.header)),
+  ]);
 
-  const totalProd = f41.prod + f47.prod;
-  const mkShare = (v, t) => t > 0 ? ((v / t) * 100).toFixed(1) : '0';
+  // Gross Production row
+  rows.push([
+    sc("Gross Production (kg)", S.cellBoldLeft),
+    ...counts.map((c) => sc(countMap[c].grossKgs, S.cell)),
+    sc(grandGross, S.cellBold),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(empty()),
+  ]);
 
-  rows.push([sc('Production (kg)', S.cellBoldLeft), sc(f41.prod, S.cell), sc(f47.prod, S.cell), sc(totalProd, S.cellBold), sc(mkShare(f41.prod, totalProd), S.cell), sc(mkShare(f47.prod, totalProd), S.cell), sc(f41.prod >= f47.prod ? 'F41' : 'F47', S.highlight), ...Array(COLS - 7).fill(empty())]);
-  rows.push([sc('Autocorner (kg)', S.cellBoldLeft), sc(f41.auto, S.cell), sc(f47.auto, S.cell), sc(f41.auto + f47.auto, S.cellBold), sc(mkShare(f41.auto, f41.auto + f47.auto), S.cell), sc(mkShare(f47.auto, f41.auto + f47.auto), S.cell), sc('—', S.cell), ...Array(COLS - 7).fill(empty())]);
-  rows.push([sc('Packing (kg)', S.cellBoldLeft), sc(f41.pack, S.cell), sc(f47.pack, S.cell), sc(f41.pack + f47.pack, S.cellBold), sc('', S.cell), sc('', S.cell), sc('—', S.cell), ...Array(COLS - 7).fill(empty())]);
-  rows.push([sc('EB Units', S.cellBoldLeft), sc(f41.eb, S.highlightAmber), sc(f47.eb, S.highlightAmber), sc(f41.eb + f47.eb, S.cellBold), sc('', S.cell), sc('', S.cell), sc('—', S.cell), ...Array(COLS - 7).fill(empty())]);
-  rows.push([sc('Entries', S.cellBoldLeft), sc(f41.count, S.cell), sc(f47.count, S.cell), sc(f41.count + f47.count, S.cellBold), sc('', S.cell), sc('', S.cell), sc('—', S.cell), ...Array(COLS - 7).fill(empty())]);
+  // Net Production row
+  const grandNet = Object.values(countMap).reduce((s, c) => s + c.netKgs, 0);
+  rows.push([
+    sc("Net Production (kg)", S.cellBoldLeft),
+    ...counts.map((c) => sc(countMap[c].netKgs, S.cell)),
+    sc(grandNet, S.cellBold),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(empty()),
+  ]);
+
+  // Waste row
+  const grandWaste = Object.values(countMap).reduce(
+    (s, c) => s + c.wasteKgs,
+    0,
+  );
+  rows.push([
+    sc("Waste (kg)", S.cellBoldLeft),
+    ...counts.map((c) => sc(countMap[c].wasteKgs, S.highlightAmber)),
+    sc(grandWaste, S.cellBold),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(empty()),
+  ]);
+
+  // Share % row
+  rows.push([
+    sc("Share of Total %", S.cellBoldLeft),
+    ...counts.map((c) =>
+      sc(
+        grandGross > 0
+          ? ((countMap[c].grossKgs / grandGross) * 100).toFixed(1)
+          : "0",
+        S.highlight,
+      ),
+    ),
+    sc("100%", S.cellBold),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(empty()),
+  ]);
 
   rows.push(emptyRow(COLS));
 
   // Efficiency comparison
-  rows.push(sectionRow('EFFICIENCY COMPARISON', COLS));
+  rows.push(sectionRow("EFFICIENCY COMPARISON", COLS));
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
-  rows.push([sc('Metric', S.headerAmber), sc('Frame 41', S.headerAmber), sc('Frame 47', S.headerAmber), sc('Better', S.headerAmber), ...Array(COLS - 4).fill(sc('', S.headerAmber))]);
+  rows.push([
+    sc("Metric", S.headerAmber),
+    ...counts.map((c) => sc(c, S.headerAmber)),
+    sc("Best", S.headerAmber),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(sc("", S.headerAmber)),
+  ]);
 
-  const f41SL = f41.prod > 0 ? ((f41.prod - f41.auto) / f41.prod * 100).toFixed(2) : 0;
-  const f47SL = f47.prod > 0 ? ((f47.prod - f47.auto) / f47.prod * 100).toFixed(2) : 0;
-  const f41AL = f41.auto > 0 ? ((f41.auto - f41.pack) / f41.auto * 100).toFixed(2) : 0;
-  const f47AL = f47.auto > 0 ? ((f47.auto - f47.pack) / f47.auto * 100).toFixed(2) : 0;
-  const f41UKG = f41.prod > 0 ? (f41.eb / f41.prod).toFixed(4) : '—';
-  const f47UKG = f47.prod > 0 ? (f47.eb / f47.prod).toFixed(4) : '—';
-  const f41GPS = f41.spindles > 0 ? (f41.prod / f41.spindles).toFixed(4) : '—';
-  const f47GPS = f47.spindles > 0 ? (f47.prod / f47.spindles).toFixed(4) : '—';
-  const f41Yield = f41.prod > 0 ? ((f41.pack / f41.prod) * 100).toFixed(1) : '0';
-  const f47Yield = f47.prod > 0 ? ((f47.pack / f47.prod) * 100).toFixed(1) : '0';
+  // Waste % row
+  const wastePcts = counts.map((c) =>
+    countMap[c].grossKgs > 0
+      ? (countMap[c].wasteKgs / countMap[c].grossKgs) * 100
+      : 0,
+  );
+  const bestWaste = counts[wastePcts.indexOf(Math.min(...wastePcts))];
+  rows.push([
+    sc("Waste %", S.cellBoldLeft),
+    ...wastePcts.map((w, i) => sc(w.toFixed(2), w > 5 ? S.warning : S.cell)),
+    sc(`${bestWaste} ✓`, S.highlight),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(empty()),
+  ]);
 
-  rows.push([sc('Spinning Loss %', S.cellBoldLeft), sc(f41SL, n(f41SL) > 5 ? S.warning : S.cell), sc(f47SL, n(f47SL) > 5 ? S.warning : S.cell), sc(n(f41SL) <= n(f47SL) ? 'F41 ✓' : 'F47 ✓', S.highlight), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('Autocorner Loss %', S.cellBoldLeft), sc(f41AL, n(f41AL) > 5 ? S.warning : S.cell), sc(f47AL, n(f47AL) > 5 ? S.warning : S.cell), sc(n(f41AL) <= n(f47AL) ? 'F41 ✓' : 'F47 ✓', S.highlight), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('UKG', S.cellBoldLeft), sc(f41UKG, S.cell), sc(f47UKG, S.cell), sc(n(f41UKG) <= n(f47UKG) ? 'F41 ✓' : 'F47 ✓', S.highlight), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('GPS (g/spindle)', S.cellBoldLeft), sc(f41GPS, S.cell), sc(f47GPS, S.cell), sc(n(f41GPS) >= n(f47GPS) ? 'F41 ✓' : 'F47 ✓', S.highlight), ...Array(COLS - 4).fill(empty())]);
-  rows.push([sc('Overall Yield %', S.cellBoldLeft), sc(f41Yield, S.cell), sc(f47Yield, S.cell), sc(n(f41Yield) >= n(f47Yield) ? 'F41 ✓' : 'F47 ✓', S.highlight), ...Array(COLS - 4).fill(empty())]);
+  // Efficiency % row
+  const effPcts = counts.map((c) =>
+    countMap[c].stdHK > 0
+      ? (countMap[c].actualHK / countMap[c].stdHK) * 100
+      : 0,
+  );
+  const bestEff = counts[effPcts.indexOf(Math.max(...effPcts))];
+  rows.push([
+    sc("Avg Efficiency %", S.cellBoldLeft),
+    ...effPcts.map((e) => sc(e.toFixed(2), e < 80 ? S.warning : S.highlight)),
+    sc(`${bestEff} ✓`, S.highlight),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(empty()),
+  ]);
+
+  // Entries row
+  rows.push([
+    sc("Total Entries", S.cellBoldLeft),
+    ...counts.map((c) => sc(countMap[c].entries, S.cell)),
+    sc(
+      Object.values(countMap).reduce((s, c) => s + c.entries, 0),
+      S.cellBold,
+    ),
+    ...Array(Math.max(0, COLS - counts.length - 2)).fill(empty()),
+  ]);
 
   rows.push(emptyRow(COLS));
-  rows.push(sectionRow(`Report generated: ${new Date().toLocaleString('en-IN')}`, COLS));
+  rows.push(
+    sectionRow(`Report generated: ${new Date().toLocaleString("en-IN")}`, COLS),
+  );
   merges.push(merge(rows.length - 1, 0, rows.length - 1, COLS - 1));
 
-  addSheet(wb, rows, 'Frame Comparison', [18, 14, 14, 14, 14, 14, 12, 10, 10], merges);
-  download(wb, `SpinLytics_Frame_Comparison.xlsx`);
+  addSheet(
+    wb,
+    rows,
+    "Count Comparison",
+    [18, 14, 14, 14, 14, 14, 12, 10, 10],
+    merges,
+  );
+  download(wb, `SpinLytics_Count_Comparison.xlsx`);
 }
+
+// Legacy alias for backwards compatibility
+export const exportFrameComparison = exportCountComparison;

@@ -1,4 +1,4 @@
-# 🏭 SpinLytics
+# 🏭 SpinLytics (2026 Standard)
 
 ---
 
@@ -6,7 +6,7 @@
 
 This system digitizes and automates a textile production workflow involving:
 
-- Production tracking (frame-based)
+- Shift-based production tracking (Ring Frame / Count based)
 - Inventory & stock management
 - Packing & dispatch tracking
 - Costing & efficiency calculations
@@ -14,36 +14,43 @@ This system digitizes and automates a textile production workflow involving:
 
 The system replaces Excel-based workflows with a **consistent, transaction-safe, and scalable architecture**.
 
-Reference logic derived from:
+All data entry happens through the **Web Dashboard** — a single, unified entry point.
 
 ---
 
 # 🧠 System Modules
 
-## 🔹 1. Production Module
+## 🔹 1. Production Module (2026 Standard)
 
-- Machine-level tracking (Frame 41, 47)
-- Calculates:
-    - Spinning Loss
-    - Autocorner Loss
-    - GPS (Gram per Spindle)
-    - UKG (Energy efficiency)
+- Row-based shift production entry (per Ring Frame)
+- Tracks per-row:
+  - R/F No., Sider Name, Count (= Frame identifier)
+  - STD Constant, STD HK, Actual HK
+  - Run Hours, Idle Spindles, Waste Kgs, Stoppages
+- Auto-calculates per-row:
+  - Production Kgs (Gross)
+  - Actual Production (Net)
+  - Waste %
+  - Worked Spindles
+  - Grams per Spindle
+  - Efficiency %
+- Aggregates by Count for daily/monthly/yearly reports
 
 ---
 
 ## 🔹 2. Stock & Inventory Module
 
 - Tracks:
-    - Raw materials (Cotton, Viscose, Fiber, Excel)
-    - Yarn production
+  - Raw materials (Cotton, Viscose, Fiber, Excel)
+  - Yarn production
 - Supports:
-    - Purchase
-    - Issue
-    - Dispatch
-    - Return
+  - Purchase
+  - Issue
+  - Dispatch
+  - Return
 - Maintains:
-    - Lot-wise tracking
-    - Party-wise tracking
+  - Lot-wise tracking
+  - Party-wise tracking
 
 ---
 
@@ -51,58 +58,84 @@ Reference logic derived from:
 
 - Monthly & yearly aggregation
 - Calculates:
-    - Yarn Realisation %
-    - Waste %
-    - Invisible Loss
-    - UKG (monthly)
+  - Yarn Realisation %
+  - Waste %
+  - Invisible Loss
+  - UKG (monthly)
+  - Avg Efficiency %
+  - Avg Grams per Spindle
 
 ---
 
-# 📱 Application Structure
+# 💻 Application Structure
 
-## 📱 Mobile App (Data Entry)
+## 💻 Web Dashboard (Data Entry + Reports)
 
 ---
 
-### 🔹 Page 1: Production Entry
+### 🔹 Entry Page 1: Production Entry (2026 Standard Sheet)
+
+**Global/Session Settings (set once per shift):**
+
+- Date (Date picker)
+- Shift Hours (8 or 12)
+- Total Spindles per Machine (1152 or 1728)
+
+**Manual Inputs (per row):**
+
+- R/F No. (String) — Ring Frame identifier
+- Sider Name (String) — Operator's name
+- Count (String) — Material count (e.g., "41s", "47s") — **THIS IS THE FRAME IDENTIFIER**
+- STD Constant (Float)
+- STD HK (Float) — Standard expected Hanks
+- Actual HK (Float) — Actual Hanks produced
+- Run Hrs (Float) — Running hours
+- Idle Spindles (Number, default 0)
+- Waste Kgs (Float)
+- Stoppages (String) — Reason/hours of stoppage
+
+**Auto-Calculated Fields (per row, real-time):**
+
+```
+Formula 1: Production Kgs (Gross)
+Production Kgs = Actual HK × STD Constant
+
+Formula 2: Actual Production Kgs (Net)
+Actual Production = Production Kgs − Waste Kgs
+
+Formula 3: Waste Percentage (%)
+Waste % = (Waste Kgs / Production Kgs) × 100
+(Returns 0 if Production Kgs = 0)
+
+Formula 4: Worked Spindles
+Worked Spindles = (Total Spindles − Idle Spindles) × (Run Hrs / Shift Hours)
+
+Formula 5: Grams per Spindle (2026 Standard — uses NET production)
+Grams per Spindle = (Actual Production × 1000) / Worked Spindles
+
+Formula 6: Efficiency (%)
+Efficiency % = (Actual HK / STD HK) × 100
+```
+
+**Save Modes:**
+
+- Individual row auto-save (save per row)
+- Batch "Save All" (saves all unsaved rows at once)
+
+---
+
+### 🔹 Entry Page 2: Stock Entry
 
 **Inputs:**
 
 - Date
-- Frame No (41 / 47)
-- Production (kg)
-- Autocorner Production (kg)
-- Packing (kg)
-- EB Units (daily)
-- No. of spindles
-- Remarks
-
-**Calculations:**
-
-```
-Spinning Loss = Production - Autocorner
-Spinning Loss % = Loss / Production
-
-Autocorner Loss = Autocorner - Packing
-Autocorner Loss % = Loss / Autocorner
-
-UKG = EB Units / Production (Frame 41)
-GPS = Production / Spindles
-```
-
----
-
-### 🔹 Page 2: Stock Entry
-
-**Inputs:**
-
-- Date
-- Material Type
-- Transaction Type (Purchase / Issue / Dispatch / Return)
+- Material Type (Cotton / Viscose / Fiber / Excel / Yarn / Waste)
+- Transaction Type (Purchase / Issue / Return)
 - Lot No
 - Party Name
 - Bags
-- Price
+- Price per Bag (optional)
+- Remarks (optional)
 
 **Calculations:**
 
@@ -110,116 +143,115 @@ GPS = Production / Spindles
 1 Bag = 60 kg
 KG = Bags × 60
 
-Closing = Opening + Purchase - Issue - Dispatch + Return
+Closing = Opening + Purchase − Issue − Dispatch + Return
 Opening = Previous Day Closing
 ```
 
 ---
 
-### 🔹 Page 3: Packing Entry (Core Integration)
+### 🔹 Entry Page 3: Packing Entry
 
 **Inputs:**
 
 - Date
 - Source (Autocorner / Production)
-- Yarn
+- Yarn Type
 - Bags
 - Lot No
-
-**Purpose:**
-
-- Updates stock
-- Used in loss calculations
-- Feeds dispatch
+- Remarks (optional)
 
 ---
 
-### 🔹 Page 4: Dispatch Entry
+### 🔹 Entry Page 4: Dispatch Entry
 
 **Inputs:**
 
 - Date
-- Material
+- Material Type
 - Lot No
-- Party
+- Party Name
 - Bags
-- Price
+- Price per Bag (optional)
+- Remarks (optional)
 
 **Effects:**
 
-- Reduces stock
-- Converts bags → kg
+- Creates dispatch record
+- Auto-creates DISPATCH stock transaction (reduces stock)
+- Both happen atomically
 
 ---
 
-### 🔹 Page 5: EB Entry
+### 🔹 Entry Page 5: EB Entry
 
 **Inputs:**
 
 - Month
-- Opening Units
+- Year
+- Opening Units (auto-filled from previous month's closing)
 - Closing Units
 
 **Calculation:**
 
 ```
-EB Units = Closing - Opening
+EB Units = Closing − Opening
 ```
 
 ---
 
-# 💻 Web Dashboard
+# 📊 Web Dashboard Reports
 
 ---
 
-### 🔹 Page 6: Daily Dashboard
+### 🔹 Page 1: Daily Dashboard
 
 Displays:
 
-- Production (41, 47)
-- Total Production
-- Spinning Loss %
-- Autocorner Loss %
-- UKG
-- GPS
-- Remarks
+- All shift production entries for the date
+- Per-row: R/F No, Sider, Count, Actual HK, Gross/Net Kg, Waste %, Efficiency %, G/Spindle
+- Count-wise (frame-wise) comparison
+- Grand totals: Total Gross/Net Production, Avg Efficiency, Total Waste
+- Stock position (Opening/Closing)
 
 ---
 
-### 🔹 Page 7: Monthly Dashboard
+### 🔹 Page 2: Monthly Dashboard
 
 **Calculations:**
 
 ```
-Total Production = Sum(41 + 47)
+Total Production (Gross) = SUM(Actual HK × STD Constant) for all shift entries in month
+Total Production (Net) = Total Gross − Total Shift Waste
 
-Cotton Issue = Cotton + Fiber + Viscose + Excel
+Cotton Issue = Cotton + Fiber + Viscose + Excel (ISSUE transactions)
 
-Yarn Realisation % = (Cotton Issue - Production) / Cotton Issue
+Yarn Realisation % = Total Gross Production / Cotton Issue × 100
 
-Waste % = Waste / Cotton Issue
+Waste % = Stock Waste / Cotton Issue × 100
 
-Invisible Loss = 100 - Realisation - Waste
+Invisible Loss = 100 − Realisation − Waste
 
-UKG = EB Units / Total Production
+UKG = EB Units / Total Gross Production
+
+Avg Efficiency = (Total Actual HK / Total STD HK) × 100
 ```
 
 ---
 
-### 🔹 Page 8: Yearly Dashboard
+### 🔹 Page 3: Yearly Dashboard
 
-- Aggregated monthly data
+- Aggregated monthly data with same formulas applied at yearly level
 
 ---
 
-### 🔹 Page 9: Stock Dashboard
+### 🔹 Page 4: Stock Dashboard
 
 Displays:
 
-- Current stock
+- Current stock per material
 - Lot-wise tracking
 - Party-wise tracking
-- Transaction history
+- Recent transactions
 
 ---
 
@@ -227,18 +259,24 @@ Displays:
 
 ---
 
-### 🔁 Flow 1: Production → Stock
+### 🔁 Flow 1: Production → Reports
 
 ```
-Production → Autocorner → Packing → Stock Increase
+Shift Production Entry → Auto-calculate 6 metrics →
+Daily Dashboard (per-row detail) →
+Monthly Dashboard (aggregated by month) →
+Yearly Dashboard (aggregated by year)
 ```
 
 ---
 
-### 🔁 Flow 2: Stock → Production
+### 🔁 Flow 2: Stock → Cotton Issue → Realisation
 
 ```
-Stock Issue → Production → Monthly Calculation
+Stock ISSUE Transactions (Cotton+Fiber+Viscose+Excel) →
+Cotton Issue (monthly sum) →
+Compared with Total Production from shift entries →
+Yarn Realisation %, Waste %, Invisible Loss %
 ```
 
 ---
@@ -246,15 +284,16 @@ Stock Issue → Production → Monthly Calculation
 ### 🔁 Flow 3: Stock → Dispatch
 
 ```
-Stock → Dispatch → Stock Decrease
+Stock → Dispatch → Stock Decrease (atomic)
 ```
 
 ---
 
-### 🔁 Flow 4: EB → Metrics
+### 🔁 Flow 4: EB → UKG
 
 ```
-EB → UKG (Daily & Monthly)
+EB Entry (Closing − Opening) → Monthly EB →
+UKG = EB / Total Gross Production
 ```
 
 ---
@@ -267,23 +306,7 @@ EB → UKG (Daily & Monthly)
 
 - Never update stock directly
 - Always insert transactions
-
-**Example Table:**
-
-```
-stock_transactions:
-- type
-- material
-- kg
-- lot_no
-- date
-```
-
-**Stock Calculation:**
-
-```
-SUM(kg)
-```
+- Stock = SUM of all transactions
 
 ---
 
@@ -291,10 +314,10 @@ SUM(kg)
 
 Always calculate dynamically:
 
-- Loss %
-- UKG
-- GPS
-- Realisation %
+- Production Kgs (Gross/Net)
+- Waste %, Efficiency %
+- Worked Spindles, Grams/Spindle
+- Realisation %, UKG
 
 ---
 
@@ -305,33 +328,17 @@ Always calculate dynamically:
 
 ---
 
-### ⚙️ 4. Data Integrity Rules
+### ⚙️ 4. Count = Frame Identifier
 
-- Packing ≤ Autocorner ≤ Production
+- "Count" field (e.g., "41s", "47s") replaces the old Frame Number concept
+- Grouping and comparison in reports is done by Count
+
+---
+
+### ⚙️ 5. Data Integrity Rules
+
 - No negative stock
-
----
-
-### ⚙️ 5. Frame Separation
-
-- Store Frame 41 & 47 separately
-- Combine only in reports
-
----
-
-# 📱 Mobile App Considerations
-
-- Offline support (local storage + sync)
-- Fast input UX (dropdowns, defaults)
-- Prevent duplicate entries
-
----
-
-# 💻 Web Considerations
-
-- Heavy aggregation queries
-- Filters (date, frame, material)
-- No strict real-time requirement
+- Dispatch auto-creates stock transaction atomically
 
 ---
 
@@ -339,8 +346,7 @@ Always calculate dynamically:
 
 ### 🎨 Frontend
 
-- React (Web Dashboard)
-- React Native (Mobile App)
+- React (Vite) — Web Dashboard + Data Entry
 
 ---
 
@@ -362,7 +368,8 @@ Always calculate dynamically:
 
 Build a **transaction-safe, scalable ERP-lite system** that ensures:
 
-- Accurate production tracking
+- Accurate shift-based production tracking
 - Reliable inventory management
 - Consistent costing calculations
 - Elimination of Excel-based errors
+- Single unified web interface for entry and reporting

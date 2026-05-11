@@ -4,15 +4,26 @@ import {
   CalendarDays,
   CalendarRange,
   Package,
-  ClipboardList,
+  ClipboardEdit,
   PackageOpen,
   Truck,
   Zap,
   Activity,
+  ClipboardList,
 } from 'lucide-react';
 import './Sidebar.css';
 
 const navItems = [
+  {
+    section: 'Data Entry',
+    links: [
+      { to: '/entry/production', icon: ClipboardEdit, label: 'Production Entry' },
+      { to: '/entry/stock', icon: Package, label: 'Stock Entry' },
+      { to: '/entry/packing', icon: PackageOpen, label: 'Packing Entry' },
+      { to: '/entry/dispatch', icon: Truck, label: 'Dispatch Entry' },
+      { to: '/entry/eb', icon: Zap, label: 'EB Entry' },
+    ],
+  },
   {
     section: 'Dashboards',
     links: [
@@ -30,10 +41,10 @@ const navItems = [
   {
     section: 'Records',
     links: [
-      { to: '/production', icon: ClipboardList, label: 'Production Log' },
-      { to: '/packing', icon: PackageOpen, label: 'Packing Log' },
-      { to: '/dispatch', icon: Truck, label: 'Dispatch Log' },
-      { to: '/energy', icon: Zap, label: 'Energy (EB) Log' },
+      { to: '/production-log', icon: ClipboardList, label: 'Production Log' },
+      { to: '/packing-log', icon: PackageOpen, label: 'Packing Log' },
+      { to: '/dispatch-log', icon: Truck, label: 'Dispatch Log' },
+      { to: '/energy-log', icon: Zap, label: 'Energy (EB) Log' },
     ],
   },
 ];

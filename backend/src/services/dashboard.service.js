@@ -1,109 +1,223 @@
-const prisma = require('../config/database');
-const { INFLOW_TYPES, OUTFLOW_TYPES } = require('../utils/constants');
-const calc = require('../utils/calculations');
+const prisma = require("../config/database");
+const {
+  INFLOW_TYPES,
+  OUTFLOW_TYPES,
+  RAW_MATERIAL_TYPES,
+} = require("../utils/constants");
+const calc = require("../utils/calculations");
+const { enrichWithCalculations } = require("./shift-production.service");
 
 /**
- * Daily Dashboard — production summary for a specific date
- * Shows both frames, losses, UKG, and GPS
+ * ═══════════════════════════════════════════════════
+ * Daily Dashboard — shift production summary for a specific date
+ * ═══════════════════════════════════════════════════
+ *
+ * DATA SOURCE: shift_production_entries
+ *
+ * FORMULA MAPPING:
+ *   Per-row (from enrichWithCalculations):
+ *     - Production Kgs (Gross) = Actual HK × STD Constant
+ *     - Actual Production (Net) = Gross − Waste
+ *     - Waste % = (Waste / Gross) × 100
+ *     - Worked Spindles = (Total − Idle) × (RunHrs / ShiftHrs)
+ *     - Grams/Spindle = (Net × 1000) / Worked Spindles
+ *     - Efficiency % = (Actual HK / STD HK) × 100
+ *
+ *   Aggregated (per-count and grand totals):
+ *     - Total Gross/Net Production = SUM of all rows
+ *     - Avg Efficiency = (SUM Actual HK / SUM STD HK) × 100
+ *     - Total Waste = SUM of wasteKgs
+ *     - Waste % = (Total Waste / Total Gross) × 100
  */
 async function getDailySummary(date) {
-  const entries = await prisma.productionEntry.findMany({
+  const entries = await prisma.shiftProductionEntry.findMany({
     where: { date: new Date(date) },
-    orderBy: { frameNumber: 'asc' },
+    orderBy: [{ count: "asc" }, { rfNo: "asc" }],
   });
 
-  const frames = entries.map((entry) => {
-    const prod = parseFloat(entry.productionKg);
-    const auto = parseFloat(entry.autocornerProductionKg);
-    const pack = parseFloat(entry.packingKg);
-    const eb = parseFloat(entry.ebUnits);
-    const spindles = entry.noOfSpindles;
+  const enriched = entries.map(enrichWithCalculations);
 
-    return {
-      ...entry,
-      calculated: {
-        spinningLossKg: calc.spinningLoss(prod, auto).toFixed(3),
-        spinningLossPercent: calc.spinningLossPercent(prod, auto).toFixed(2),
-        autocornerLossKg: calc.autocornerLoss(auto, pack).toFixed(3),
-        autocornerLossPercent: calc.autocornerLossPercent(auto, pack).toFixed(2),
-        ukg: calc.ukg(eb, prod).toFixed(4),
-        gps: calc.gps(prod, spindles).toFixed(4),
-      },
-    };
-  });
-
-  // Calculate combined totals
-  let totals = null;
-  if (frames.length > 0) {
-    const totalProd = frames.reduce((sum, e) => sum + parseFloat(e.productionKg), 0);
-    const totalAuto = frames.reduce((sum, e) => sum + parseFloat(e.autocornerProductionKg), 0);
-    const totalPack = frames.reduce((sum, e) => sum + parseFloat(e.packingKg), 0);
-    const totalEB = frames.reduce((sum, e) => sum + parseFloat(e.ebUnits), 0);
-    const totalSpindles = frames.reduce((sum, e) => sum + e.noOfSpindles, 0);
-
-    totals = {
-      totalProductionKg: totalProd.toFixed(3),
-      totalAutocornerKg: totalAuto.toFixed(3),
-      totalPackingKg: totalPack.toFixed(3),
-      totalEBUnits: totalEB.toFixed(3),
-      totalSpindles,
-      spinningLossPercent: calc.spinningLossPercent(totalProd, totalAuto).toFixed(2),
-      autocornerLossPercent: calc.autocornerLossPercent(totalAuto, totalPack).toFixed(2),
-      ukg: calc.ukg(totalEB, totalProd).toFixed(4),
-      gps: calc.gps(totalProd, totalSpindles).toFixed(4),
-    };
+  // ─── Group by Count (frame) ───
+  const countGroups = {};
+  for (const entry of enriched) {
+    const c = entry.count;
+    if (!countGroups[c]) {
+      countGroups[c] = {
+        count: c,
+        entries: [],
+        totalGrossKgs: 0,
+        totalNetKgs: 0,
+        totalWasteKgs: 0,
+        totalActualHK: 0,
+        totalStdHK: 0,
+      };
+    }
+    countGroups[c].entries.push(entry);
+    countGroups[c].totalGrossKgs += parseFloat(
+      entry.calculated.productionKgsGross,
+    );
+    countGroups[c].totalNetKgs += parseFloat(
+      entry.calculated.actualProductionKgs,
+    );
+    countGroups[c].totalWasteKgs += parseFloat(entry.wasteKgs);
+    countGroups[c].totalActualHK += parseFloat(entry.actualHK);
+    countGroups[c].totalStdHK += parseFloat(entry.stdHK);
   }
 
-  return { date, frames, totals };
+  const countSummaries = Object.values(countGroups).map((g) => ({
+    count: g.count,
+    entryCount: g.entries.length,
+    totalGrossKgs: g.totalGrossKgs.toFixed(3),
+    totalNetKgs: g.totalNetKgs.toFixed(3),
+    totalWasteKgs: g.totalWasteKgs.toFixed(3),
+    wastePercent:
+      g.totalGrossKgs > 0
+        ? ((g.totalWasteKgs / g.totalGrossKgs) * 100).toFixed(2)
+        : "0.00",
+    avgEfficiency:
+      g.totalStdHK > 0
+        ? ((g.totalActualHK / g.totalStdHK) * 100).toFixed(2)
+        : "0.00",
+  }));
+
+  // ─── Grand totals ───
+  const grandGross = enriched.reduce(
+    (s, e) => s + parseFloat(e.calculated.productionKgsGross),
+    0,
+  );
+  const grandNet = enriched.reduce(
+    (s, e) => s + parseFloat(e.calculated.actualProductionKgs),
+    0,
+  );
+  const grandWaste = enriched.reduce((s, e) => s + parseFloat(e.wasteKgs), 0);
+  const grandActualHK = enriched.reduce(
+    (s, e) => s + parseFloat(e.actualHK),
+    0,
+  );
+  const grandStdHK = enriched.reduce((s, e) => s + parseFloat(e.stdHK), 0);
+
+  const totals = {
+    totalGrossKgs: grandGross.toFixed(3),
+    totalNetKgs: grandNet.toFixed(3),
+    totalWasteKgs: grandWaste.toFixed(3),
+    wastePercent:
+      grandGross > 0 ? ((grandWaste / grandGross) * 100).toFixed(2) : "0.00",
+    avgEfficiency:
+      grandStdHK > 0 ? ((grandActualHK / grandStdHK) * 100).toFixed(2) : "0.00",
+    entryCount: enriched.length,
+  };
+
+  return { date, entries: enriched, countSummaries, totals };
 }
 
 /**
+ * ═══════════════════════════════════════════════════
  * Monthly Dashboard — aggregated production metrics for a month
- * Includes: total production, cotton issue, yarn realisation %, waste %, invisible loss, UKG
+ * ═══════════════════════════════════════════════════
+ *
+ * DATA SOURCES:
+ *   A. shift_production_entries → Total Production (Gross/Net), Efficiency, Waste, Grams/Spindle
+ *   B. stock_transactions (ISSUE, raw materials) → Cotton Issue
+ *   C. stock_transactions (WASTE material) → Monthly Waste for Realisation
+ *   D. eb_entries → EB Units Consumed
+ *
+ * FORMULA MAPPING (Monthly Report):
+ *   Total Production (Gross) = SUM(Actual HK × STD Constant) for all rows in month
+ *   Total Production (Net)   = Total Gross − Total Waste (from shift entries)
+ *   Avg Efficiency           = (SUM Actual HK / SUM STD HK) × 100
+ *   Cotton Issue             = Cotton + Fiber + Viscose + Excel (ISSUE transactions in month)
+ *   Yarn Realisation %       = Total Gross Production / Cotton Issue × 100
+ *   Waste % (Report)         = Stock Waste / Cotton Issue × 100
+ *   Invisible Loss %         = 100 − Yarn Realisation − Waste %
+ *   Monthly UKG              = EB Units Consumed / Total Gross Production
  */
 async function getMonthlySummary(year, month) {
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0); // Last day of month
 
-  // Get all production entries for the month
-  const productionEntries = await prisma.productionEntry.findMany({
+  // ═══ SOURCE A: Shift Production Entries ═══
+  const shiftEntries = await prisma.shiftProductionEntry.findMany({
     where: {
       date: { gte: startDate, lte: endDate },
     },
   });
 
-  // Calculate total production
-  const totalProduction = productionEntries.reduce(
-    (sum, e) => sum + parseFloat(e.productionKg), 0
-  );
-  const totalAutocorner = productionEntries.reduce(
-    (sum, e) => sum + parseFloat(e.autocornerProductionKg), 0
-  );
-  const totalPacking = productionEntries.reduce(
-    (sum, e) => sum + parseFloat(e.packingKg), 0
-  );
+  // Enrich each entry with calculations
+  const enriched = shiftEntries.map(enrichWithCalculations);
 
-  // Frame-wise breakdown
-  const frame41 = productionEntries
-    .filter((e) => e.frameNumber === 'FRAME_41')
-    .reduce((sum, e) => sum + parseFloat(e.productionKg), 0);
-  const frame47 = productionEntries
-    .filter((e) => e.frameNumber === 'FRAME_47')
-    .reduce((sum, e) => sum + parseFloat(e.productionKg), 0);
+  // Calculate totals from shift entries
+  let totalGrossKgs = 0;
+  let totalNetKgs = 0;
+  let totalShiftWaste = 0;
+  let totalActualHK = 0;
+  let totalStdHK = 0;
 
-  // Get stock transactions for the month (to calculate cotton issue)
+  // Count-wise (frame-wise) breakdown
+  const countMap = {};
+
+  for (const entry of enriched) {
+    const gross = parseFloat(entry.calculated.productionKgsGross);
+    const net = parseFloat(entry.calculated.actualProductionKgs);
+    const waste = parseFloat(entry.wasteKgs);
+    const actualHK = parseFloat(entry.actualHK);
+    const stdHK = parseFloat(entry.stdHK);
+
+    totalGrossKgs += gross;
+    totalNetKgs += net;
+    totalShiftWaste += waste;
+    totalActualHK += actualHK;
+    totalStdHK += stdHK;
+
+    // Group by count (frame)
+    const c = entry.count;
+    if (!countMap[c]) {
+      countMap[c] = {
+        grossKgs: 0,
+        netKgs: 0,
+        wasteKgs: 0,
+        actualHK: 0,
+        stdHK: 0,
+      };
+    }
+    countMap[c].grossKgs += gross;
+    countMap[c].netKgs += net;
+    countMap[c].wasteKgs += waste;
+    countMap[c].actualHK += actualHK;
+    countMap[c].stdHK += stdHK;
+  }
+
+  // Count-wise production breakdown
+  const countBreakdown = Object.entries(countMap).map(([count, data]) => ({
+    count,
+    grossKgs: data.grossKgs.toFixed(3),
+    netKgs: data.netKgs.toFixed(3),
+    wasteKgs: data.wasteKgs.toFixed(3),
+    wastePercent:
+      data.grossKgs > 0
+        ? ((data.wasteKgs / data.grossKgs) * 100).toFixed(2)
+        : "0.00",
+    avgEfficiency:
+      data.stdHK > 0 ? ((data.actualHK / data.stdHK) * 100).toFixed(2) : "0.00",
+    percentOfTotal:
+      totalGrossKgs > 0
+        ? ((data.grossKgs / totalGrossKgs) * 100).toFixed(1)
+        : "0.0",
+  }));
+
+  // Days recorded
+  const daysRecorded = new Set(
+    shiftEntries.map((e) => e.date.toISOString().split("T")[0]),
+  ).size;
+
+  // ═══ SOURCE B: Stock ISSUE Transactions (Cotton Issue) ═══
   const stockTransactions = await prisma.stockTransaction.findMany({
     where: {
       date: { gte: startDate, lte: endDate },
-      transactionType: 'ISSUE',
+      transactionType: "ISSUE",
     },
   });
 
-  // Cotton Issue = Cotton + Fiber + Viscose + Excel (all raw material issues)
-  const rawMaterialIssues = {
-    cotton: 0, fiber: 0, viscose: 0, excel: 0,
-  };
-
+  const rawMaterialIssues = { cotton: 0, fiber: 0, viscose: 0, excel: 0 };
   for (const txn of stockTransactions) {
     const kgs = parseFloat(txn.kgs);
     const type = txn.materialType.toLowerCase();
@@ -114,49 +228,61 @@ async function getMonthlySummary(year, month) {
 
   const cottonIssue = calc.totalCottonIssue(rawMaterialIssues).toNumber();
 
-  // Get waste for the month
+  // ═══ SOURCE C: Waste Transactions (for Realisation calculation) ═══
   const wasteTransactions = await prisma.stockTransaction.findMany({
     where: {
       date: { gte: startDate, lte: endDate },
-      materialType: 'WASTE',
+      materialType: "WASTE",
     },
   });
-  const totalWaste = wasteTransactions.reduce((sum, t) => {
+
+  const stockWaste = wasteTransactions.reduce((sum, t) => {
     const kgs = parseFloat(t.kgs);
     return INFLOW_TYPES.includes(t.transactionType) ? sum + kgs : sum - kgs;
   }, 0);
 
-  // Get EB entry for this month
+  // ═══ SOURCE D: EB Entry ═══
   const ebEntry = await prisma.eBEntry.findUnique({
     where: { month_year: { month, year } },
   });
 
   let ebUnits = 0;
   if (ebEntry) {
-    ebUnits = calc.ebUnitsConsumed(
-      parseFloat(ebEntry.closingUnits),
-      parseFloat(ebEntry.openingUnits)
-    ).toNumber();
+    ebUnits = calc
+      .ebUnitsConsumed(
+        parseFloat(ebEntry.closingUnits),
+        parseFloat(ebEntry.openingUnits),
+      )
+      .toNumber();
   }
 
-  // Calculate derived metrics
-  const yarnRealisation = calc.yarnRealisationPercent(cottonIssue, totalProduction);
-  const wastePct = calc.wastePercent(totalWaste, cottonIssue);
+  // ═══ DERIVED METRICS ═══
+  // Use totalGrossKgs as "Total Production" for Yarn Realisation & UKG
+  const yarnRealisation = calc.yarnRealisationPercent(
+    cottonIssue,
+    totalGrossKgs,
+  );
+  const wastePct = calc.wastePercent(stockWaste, cottonIssue);
   const invLoss = calc.invisibleLoss(yarnRealisation, wastePct);
-  const monthlyUkg = calc.ukg(ebUnits, totalProduction);
+  const monthlyUkg = calc.ukg(ebUnits, totalGrossKgs);
 
   return {
     year,
     month,
     production: {
-      frame41Kg: frame41.toFixed(3),
-      frame47Kg: frame47.toFixed(3),
-      totalProductionKg: totalProduction.toFixed(3),
-      totalAutocornerKg: totalAutocorner.toFixed(3),
-      totalPackingKg: totalPacking.toFixed(3),
-      spinningLossPercent: calc.spinningLossPercent(totalProduction, totalAutocorner).toFixed(2),
-      autocornerLossPercent: calc.autocornerLossPercent(totalAutocorner, totalPacking).toFixed(2),
-      daysRecorded: new Set(productionEntries.map(e => e.date.toISOString().split('T')[0])).size,
+      totalGrossKgs: totalGrossKgs.toFixed(3),
+      totalNetKgs: totalNetKgs.toFixed(3),
+      totalShiftWasteKgs: totalShiftWaste.toFixed(3),
+      shiftWastePercent:
+        totalGrossKgs > 0
+          ? ((totalShiftWaste / totalGrossKgs) * 100).toFixed(2)
+          : "0.00",
+      avgEfficiency:
+        totalStdHK > 0
+          ? ((totalActualHK / totalStdHK) * 100).toFixed(2)
+          : "0.00",
+      daysRecorded,
+      countBreakdown,
     },
     rawMaterials: {
       cottonIssueKg: rawMaterialIssues.cotton.toFixed(3),
@@ -169,7 +295,7 @@ async function getMonthlySummary(year, month) {
       yarnRealisationPercent: yarnRealisation.toFixed(2),
       wastePercent: wastePct.toFixed(2),
       invisibleLossPercent: invLoss.toFixed(2),
-      totalWasteKg: totalWaste.toFixed(3),
+      totalStockWasteKg: stockWaste.toFixed(3),
     },
     energy: {
       ebUnitsConsumed: ebUnits.toFixed(3),
@@ -179,7 +305,12 @@ async function getMonthlySummary(year, month) {
 }
 
 /**
+ * ═══════════════════════════════════════════════════
  * Yearly Dashboard — aggregated monthly summaries for a year
+ * ═══════════════════════════════════════════════════
+ *
+ * Generates monthly summary for each of 12 months, then frontend aggregates.
+ * Same formulas as monthly, but summed across 12 months.
  */
 async function getYearlySummary(year) {
   const months = [];
@@ -189,11 +320,15 @@ async function getYearlySummary(year) {
       const summary = await getMonthlySummary(year, month);
       months.push(summary);
     } catch {
-      // Skip months with no data
       months.push({
         year,
         month,
-        production: { totalProductionKg: '0.000' },
+        production: {
+          totalGrossKgs: "0.000",
+          totalNetKgs: "0.000",
+          countBreakdown: [],
+        },
+        rawMaterials: {},
         metrics: {},
         energy: {},
       });
@@ -201,26 +336,37 @@ async function getYearlySummary(year) {
   }
 
   // Calculate yearly totals
-  const yearlyTotalProduction = months.reduce(
-    (sum, m) => sum + parseFloat(m.production.totalProductionKg || 0), 0
+  const yearlyGross = months.reduce(
+    (s, m) => s + parseFloat(m.production.totalGrossKgs || 0),
+    0,
+  );
+  const yearlyNet = months.reduce(
+    (s, m) => s + parseFloat(m.production.totalNetKgs || 0),
+    0,
   );
 
   return {
     year,
     months,
     yearlyTotals: {
-      totalProductionKg: yearlyTotalProduction.toFixed(3),
+      totalGrossKgs: yearlyGross.toFixed(3),
+      totalNetKgs: yearlyNet.toFixed(3),
     },
   };
 }
 
 /**
- * Stock Dashboard — current overview
+ * ═══════════════════════════════════════════════════
+ * Stock Dashboard — current stock overview
+ * ═══════════════════════════════════════════════════
+ *
+ * No change in logic — still sums all stock transactions.
+ * Stock = SUM(PURCHASE + RETURN) − SUM(ISSUE + DISPATCH)
  */
 async function getStockDashboard() {
   // Get current stock per material
   const stockResult = await prisma.stockTransaction.groupBy({
-    by: ['materialType', 'transactionType'],
+    by: ["materialType", "transactionType"],
     _sum: { kgs: true, bags: true },
   });
 
@@ -248,7 +394,7 @@ async function getStockDashboard() {
 
   // Get lot-wise summary
   const lotResult = await prisma.stockTransaction.groupBy({
-    by: ['materialType', 'lotNo', 'transactionType'],
+    by: ["materialType", "lotNo", "transactionType"],
     _sum: { kgs: true },
   });
 
@@ -256,7 +402,11 @@ async function getStockDashboard() {
   for (const row of lotResult) {
     const key = `${row.materialType}::${row.lotNo}`;
     if (!lotMap[key]) {
-      lotMap[key] = { materialType: row.materialType, lotNo: row.lotNo, kgs: 0 };
+      lotMap[key] = {
+        materialType: row.materialType,
+        lotNo: row.lotNo,
+        kgs: 0,
+      };
     }
     const kgs = parseFloat(row._sum.kgs) || 0;
     if (INFLOW_TYPES.includes(row.transactionType)) {
@@ -272,7 +422,7 @@ async function getStockDashboard() {
 
   // Recent transactions
   const recentTransactions = await prisma.stockTransaction.findMany({
-    orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
+    orderBy: [{ date: "desc" }, { createdAt: "desc" }],
     take: 20,
   });
 

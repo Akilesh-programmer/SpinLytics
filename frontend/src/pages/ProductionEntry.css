@@ -1,0 +1,264 @@
+/* ═══════════════════════════════════════════════════
+   Production Entry — 2026 Spreadsheet Style
+   ═══════════════════════════════════════════════════ */
+
+.entry-page {
+  padding: 24px 28px;
+  max-width: 1600px;
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ─── Session Settings Bar ──────────────────────── */
+.session-bar {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.session-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.session-field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.session-field input,
+.session-field select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.session-field input:focus,
+.session-field select:focus {
+  border-color: var(--accent-teal);
+  box-shadow: 0 0 0 2px var(--accent-teal-dim);
+}
+
+/* ─── Entry Table ───────────────────────────────── */
+.entry-table-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.entry-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1400px;
+}
+
+.entry-table thead th {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.entry-table thead th.calc-header {
+  color: var(--accent-teal);
+  background: rgba(0, 212, 170, 0.05);
+}
+
+.entry-table tbody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background var(--transition-fast);
+  animation: fadeInUp 0.25s ease both;
+}
+
+.entry-table tbody tr:hover {
+  background: var(--bg-card-hover);
+}
+
+.entry-table tbody td {
+  padding: 6px 6px;
+  vertical-align: middle;
+}
+
+.entry-table tbody td input {
+  background: var(--bg-input);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  padding: 6px 8px;
+  width: 100%;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.entry-table tbody td input:focus {
+  border-color: var(--accent-teal);
+  background: rgba(0, 212, 170, 0.05);
+}
+
+.entry-table tbody td input.input-sm {
+  width: 70px;
+}
+
+.entry-table tbody td input.input-md {
+  width: 90px;
+}
+
+/* ─── Auto-Calculated Cells ──────────────────────── */
+.calc-cell {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.calc-cell.good {
+  color: var(--accent-emerald);
+}
+.calc-cell.warn {
+  color: var(--accent-amber);
+}
+.calc-cell.info {
+  color: var(--accent-cyan);
+}
+.calc-cell.highlight {
+  color: var(--accent-teal);
+}
+
+/* ─── Row Actions ────────────────────────────────── */
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.row-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.row-btn:hover {
+  background: var(--accent-red-dim);
+  color: var(--accent-red);
+}
+
+.row-btn.save-btn:hover {
+  background: var(--accent-teal-dim);
+  color: var(--accent-teal);
+}
+
+.row-status {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.row-status.unsaved {
+  background: var(--accent-amber);
+}
+.row-status.saved {
+  background: var(--accent-emerald);
+}
+.row-status.saving {
+  background: var(--accent-blue);
+  animation: pulse 1s infinite;
+}
+
+/* ─── Bottom Actions Bar ─────────────────────────── */
+.entry-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.entry-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.entry-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.entry-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Toast / Success Message ────────────────────── */
+.entry-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--accent-emerald);
+  color: #0a0d14;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.3s ease;
+  z-index: 100;
+}
+
+.entry-toast.error {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+/* ─── Responsive ─────────────────────────────────── */
+@media (max-width: 900px) {
+  .session-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .session-field {
+    min-width: 100%;
+  }
+}

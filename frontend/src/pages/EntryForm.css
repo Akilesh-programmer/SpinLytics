@@ -1,0 +1,116 @@
+/* ═══════════════════════════════════════════════════
+   Entry Form — Shared styles for Stock/Packing/Dispatch/EB
+   ═══════════════════════════════════════════════════ */
+
+.entry-form-page {
+  padding: 24px 28px;
+  max-width: 800px;
+  animation: fadeIn 0.3s ease;
+}
+
+.entry-form {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+
+.entry-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.entry-form-grid.cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent-teal);
+  box-shadow: 0 0 0 2px var(--accent-teal-dim);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-group .auto-calc {
+  background: rgba(0, 212, 170, 0.08);
+  border: 1px solid rgba(0, 212, 170, 0.2);
+  color: var(--accent-teal);
+  font-weight: 600;
+  cursor: default;
+}
+
+.form-group .auto-calc-label {
+  font-size: 0.7rem;
+  color: var(--accent-teal);
+  margin-top: 2px;
+}
+
+.entry-form-actions {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.entry-form-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 20px 0;
+}
+
+/* ─── Recent Entries Table Below Form ────────────── */
+.recent-entries {
+  margin-top: 32px;
+}
+
+.recent-entries h3 {
+  margin-bottom: 12px;
+}
+
+@media (max-width: 600px) {
+  .entry-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .entry-form-grid.cols-3 {
+    grid-template-columns: 1fr;
+  }
+}

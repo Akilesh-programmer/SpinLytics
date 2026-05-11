@@ -1,8 +1,8 @@
-const prisma = require('../config/database');
-const ApiError = require('../utils/ApiError');
-const { BAG_TO_KG, INFLOW_TYPES } = require('../utils/constants');
-const { bagToKg } = require('../utils/calculations');
-const stockService = require('./stock.service');
+const prisma = require("../config/database");
+const ApiError = require("../utils/ApiError");
+const { BAG_TO_KG, INFLOW_TYPES } = require("../utils/constants");
+const { bagToKg } = require("../utils/calculations");
+const stockService = require("./stock.service");
 
 /**
  * Create a new dispatch entry
@@ -10,13 +10,15 @@ const stockService = require('./stock.service');
  */
 async function create(data) {
   const kgs = bagToKg(data.bags).toNumber();
-  const totalPrice = data.pricePerBag ? parseFloat((data.bags * data.pricePerBag).toFixed(2)) : null;
+  const totalPrice = data.pricePerBag
+    ? parseFloat((data.bags * data.pricePerBag).toFixed(2))
+    : null;
 
   // Use Prisma transaction to ensure atomicity
   const result = await prisma.$transaction(async (tx) => {
     // Check sufficient stock
     const stockResult = await tx.stockTransaction.groupBy({
-      by: ['transactionType'],
+      by: ["transactionType"],
       where: { materialType: data.materialType },
       _sum: { kgs: true },
     });
@@ -33,7 +35,7 @@ async function create(data) {
 
     if (currentStock < kgs) {
       throw ApiError.badRequest(
-        `Insufficient stock for ${data.materialType}. Available: ${currentStock.toFixed(3)} kg, Requested: ${kgs.toFixed(3)} kg`
+        `Insufficient stock for ${data.materialType}. Available: ${currentStock.toFixed(3)} kg, Requested: ${kgs.toFixed(3)} kg`,
       );
     }
 
@@ -57,7 +59,7 @@ async function create(data) {
       data: {
         date: new Date(data.date),
         materialType: data.materialType,
-        transactionType: 'DISPATCH',
+        transactionType: "DISPATCH",
         lotNo: data.lotNo,
         partyName: data.partyName,
         bags: data.bags,
@@ -78,7 +80,15 @@ async function create(data) {
  * Get all dispatch entries with filters and pagination
  */
 async function findAll(query) {
-  const { startDate, endDate, materialType, lotNo, partyName, page = 1, limit = 20 } = query;
+  const {
+    startDate,
+    endDate,
+    materialType,
+    lotNo,
+    partyName,
+    page = 1,
+    limit = 20,
+  } = query;
   const skip = (page - 1) * limit;
 
   const where = {};
@@ -89,13 +99,13 @@ async function findAll(query) {
     if (endDate) where.date.lte = new Date(endDate);
   }
   if (materialType) where.materialType = materialType;
-  if (lotNo) where.lotNo = { contains: lotNo, mode: 'insensitive' };
-  if (partyName) where.partyName = { contains: partyName, mode: 'insensitive' };
+  if (lotNo) where.lotNo = { contains: lotNo, mode: "insensitive" };
+  if (partyName) where.partyName = { contains: partyName, mode: "insensitive" };
 
   const [entries, total] = await Promise.all([
     prisma.dispatchEntry.findMany({
       where,
-      orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       skip,
       take: limit,
     }),
@@ -122,14 +132,14 @@ async function findById(id) {
   });
 
   if (!entry) {
-    throw ApiError.notFound('Dispatch entry not found');
+    throw ApiError.notFound("Dispatch entry not found");
   }
 
   return entry;
 }
 
 /**
- * Update a dispatch entry
+ * Update a dispatch entry and keep the linked stock transaction in sync
  */
 async function update(id, data) {
   const existing = await prisma.dispatchEntry.findUnique({
@@ -137,7 +147,7 @@ async function update(id, data) {
   });
 
   if (!existing) {
-    throw ApiError.notFound('Dispatch entry not found');
+    throw ApiError.notFound("Dispatch entry not found");
   }
 
   const updateData = {};
@@ -151,21 +161,84 @@ async function update(id, data) {
   }
   if (data.pricePerBag !== undefined) {
     updateData.pricePerBag = data.pricePerBag;
-    const bags = data.bags !== undefined ? data.bags : parseFloat(existing.bags);
-    updateData.totalPrice = data.pricePerBag ? parseFloat((bags * data.pricePerBag).toFixed(2)) : null;
+    const bags =
+      data.bags !== undefined ? data.bags : parseFloat(existing.bags);
+    updateData.totalPrice = data.pricePerBag
+      ? parseFloat((bags * data.pricePerBag).toFixed(2))
+      : null;
   }
   if (data.remarks !== undefined) updateData.remarks = data.remarks;
 
-  const entry = await prisma.dispatchEntry.update({
-    where: { id },
-    data: updateData,
+  const result = await prisma.$transaction(async (tx) => {
+    // If increasing dispatch quantity, verify there is sufficient remaining stock
+    if (updateData.kgs !== undefined) {
+      const newKgs = updateData.kgs;
+      const oldKgs = parseFloat(existing.kgs);
+      const extraNeeded = newKgs - oldKgs;
+
+      if (extraNeeded > 0) {
+        const materialType = updateData.materialType || existing.materialType;
+        const stockResult = await tx.stockTransaction.groupBy({
+          by: ["transactionType"],
+          where: { materialType },
+          _sum: { kgs: true },
+        });
+
+        let currentStock = 0;
+        for (const row of stockResult) {
+          const rowKgs = parseFloat(row._sum.kgs) || 0;
+          if (INFLOW_TYPES.includes(row.transactionType)) {
+            currentStock += rowKgs;
+          } else {
+            currentStock -= rowKgs;
+          }
+        }
+
+        if (currentStock < extraNeeded) {
+          throw ApiError.badRequest(
+            `Insufficient stock for ${materialType}. Additional needed: ${extraNeeded.toFixed(3)} kg, Available: ${currentStock.toFixed(3)} kg`,
+          );
+        }
+      }
+    }
+
+    const entry = await tx.dispatchEntry.update({
+      where: { id },
+      data: updateData,
+    });
+
+    // Keep the linked DISPATCH stock transaction in sync
+    const txnUpdateData = {};
+    if (updateData.date) txnUpdateData.date = updateData.date;
+    if (updateData.materialType)
+      txnUpdateData.materialType = updateData.materialType;
+    if (updateData.lotNo) txnUpdateData.lotNo = updateData.lotNo;
+    if (updateData.partyName) txnUpdateData.partyName = updateData.partyName;
+    if (updateData.bags !== undefined) txnUpdateData.bags = updateData.bags;
+    if (updateData.kgs !== undefined) txnUpdateData.kgs = updateData.kgs;
+    if (updateData.pricePerBag !== undefined)
+      txnUpdateData.pricePerBag = updateData.pricePerBag;
+    if (updateData.totalPrice !== undefined)
+      txnUpdateData.totalPrice = updateData.totalPrice;
+
+    if (Object.keys(txnUpdateData).length > 0) {
+      await tx.stockTransaction.updateMany({
+        where: {
+          transactionType: "DISPATCH",
+          remarks: `Auto-created from dispatch ${id}`,
+        },
+        data: txnUpdateData,
+      });
+    }
+
+    return entry;
   });
 
-  return entry;
+  return result;
 }
 
 /**
- * Delete a dispatch entry
+ * Delete a dispatch entry and its linked stock transaction atomically
  */
 async function remove(id) {
   const existing = await prisma.dispatchEntry.findUnique({
@@ -173,12 +246,18 @@ async function remove(id) {
   });
 
   if (!existing) {
-    throw ApiError.notFound('Dispatch entry not found');
+    throw ApiError.notFound("Dispatch entry not found");
   }
 
-  await prisma.dispatchEntry.delete({
-    where: { id },
-  });
+  await prisma.$transaction([
+    prisma.dispatchEntry.delete({ where: { id } }),
+    prisma.stockTransaction.deleteMany({
+      where: {
+        transactionType: "DISPATCH",
+        remarks: `Auto-created from dispatch ${id}`,
+      },
+    }),
+  ]);
 
   return { id };
 }

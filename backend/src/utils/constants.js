@@ -1,14 +1,20 @@
 /**
- * System constants for SpinLytics
+ * System constants for SpinLytics (2026 Standard)
  */
 
 // Conversion: 1 bag = 60 kg
 const BAG_TO_KG = 60;
 
-// Frame numbers used in production
-const FRAME_NUMBERS = {
-  FRAME_41: 'FRAME_41',
-  FRAME_47: 'FRAME_47',
+// Common Total Spindles per Machine values
+const SPINDLE_PRESETS = {
+  STANDARD: 1152,
+  LARGE: 1728,
+};
+
+// Common Shift Hours
+const SHIFT_PRESETS = {
+  SHORT: 8,
+  LONG: 12,
 };
 
 // Material types
@@ -20,6 +26,9 @@ const MATERIAL_TYPES = {
   YARN: 'YARN',
   WASTE: 'WASTE',
 };
+
+// Raw material types (used for Cotton Issue calculation)
+const RAW_MATERIAL_TYPES = ['COTTON', 'VISCOSE', 'FIBER', 'EXCEL'];
 
 // Transaction types
 const TRANSACTION_TYPES = {
@@ -43,8 +52,10 @@ const PACKING_SOURCES = {
 
 module.exports = {
   BAG_TO_KG,
-  FRAME_NUMBERS,
+  SPINDLE_PRESETS,
+  SHIFT_PRESETS,
   MATERIAL_TYPES,
+  RAW_MATERIAL_TYPES,
   TRANSACTION_TYPES,
   INFLOW_TYPES,
   OUTFLOW_TYPES,

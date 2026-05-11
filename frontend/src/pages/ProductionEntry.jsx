@@ -18,6 +18,7 @@ const emptyRow = () => ({
   runHrs: '',
   idleSpindles: '0',
   wasteKgs: '',
+  autocornerKg: '',
   stoppages: '',
 });
 
@@ -38,8 +39,17 @@ function calcRow(row, session) {
   const ws = shiftHours > 0 ? (totalSpindles - idle) * (runHrs / shiftHours) : 0;
   const gps = ws > 0 ? (netKgs * 1000) / ws : 0;
   const efficiency = stdHK > 0 ? (actualHK / stdHK) * 100 : 0;
+  const yieldPct = grossKgs > 0 ? (netKgs / grossKgs) * 100 : 0;
 
-  return { grossKgs, netKgs, wastePct, ws, gps, efficiency };
+  // 2-stage loss (only if autocornerKg entered)
+  const autoKg = parseFloat(row.autocornerKg);
+  const hasAuto = !isNaN(autoKg) && row.autocornerKg !== '';
+  const spinLoss = hasAuto ? grossKgs - autoKg : null;
+  const spinLossPct = hasAuto && grossKgs > 0 ? (spinLoss / grossKgs) * 100 : null;
+  const autoLoss = hasAuto ? autoKg - netKgs : null;
+  const autoLossPct = hasAuto && autoKg > 0 ? (autoLoss / autoKg) * 100 : null;
+
+  return { grossKgs, netKgs, wastePct, ws, gps, efficiency, yieldPct, spinLoss, spinLossPct, autoLoss, autoLossPct, hasAuto };
 }
 
 export default function ProductionEntry() {
@@ -104,6 +114,7 @@ export default function ProductionEntry() {
         runHrs: parseFloat(row.runHrs) || 0,
         idleSpindles: parseInt(row.idleSpindles) || 0,
         wasteKgs: parseFloat(row.wasteKgs) || 0,
+        autocornerKg: row.autocornerKg !== '' ? parseFloat(row.autocornerKg) : null,
         stoppages: row.stoppages || null,
       };
 
@@ -150,6 +161,7 @@ export default function ProductionEntry() {
           runHrs: parseFloat(r.runHrs) || 0,
           idleSpindles: parseInt(r.idleSpindles) || 0,
           wasteKgs: parseFloat(r.wasteKgs) || 0,
+          autocornerKg: r.autocornerKg !== '' ? parseFloat(r.autocornerKg) : null,
           stoppages: r.stoppages || null,
         })),
       };
@@ -231,6 +243,7 @@ export default function ProductionEntry() {
               <th>Run Hrs</th>
               <th>Idle Spnl</th>
               <th>Waste Kg</th>
+              <th>Auto Kg</th>
               <th>Stoppages</th>
               <th className="calc-header">Prod Kgs</th>
               <th className="calc-header">Act Prod</th>
@@ -238,6 +251,9 @@ export default function ProductionEntry() {
               <th className="calc-header">Wkd Spnl</th>
               <th className="calc-header">G/Spindle</th>
               <th className="calc-header">Eff %</th>
+              <th className="calc-header">Yield %</th>
+              <th className="calc-header">Spin Loss</th>
+              <th className="calc-header">Auto Loss</th>
               <th style={{ width: 70 }}>Actions</th>
             </tr>
           </thead>
@@ -258,6 +274,7 @@ export default function ProductionEntry() {
                   <td><input value={row.runHrs} onChange={(e) => updateRow(i, 'runHrs', e.target.value)} placeholder="0.0" className="input-sm" type="number" step="any" /></td>
                   <td><input value={row.idleSpindles} onChange={(e) => updateRow(i, 'idleSpindles', e.target.value)} placeholder="0" className="input-sm" type="number" /></td>
                   <td><input value={row.wasteKgs} onChange={(e) => updateRow(i, 'wasteKgs', e.target.value)} placeholder="0.0" className="input-sm" type="number" step="any" /></td>
+                  <td><input value={row.autocornerKg} onChange={(e) => updateRow(i, 'autocornerKg', e.target.value)} placeholder="—" className="input-sm" type="number" step="any" /></td>
                   <td><input value={row.stoppages} onChange={(e) => updateRow(i, 'stoppages', e.target.value)} placeholder="—" /></td>
                   {/* Auto-calculated columns */}
                   <td className="calc-cell highlight">{c.grossKgs > 0 ? c.grossKgs.toFixed(2) : '—'}</td>
@@ -266,6 +283,9 @@ export default function ProductionEntry() {
                   <td className="calc-cell info">{c.ws > 0 ? c.ws.toFixed(1) : '—'}</td>
                   <td className="calc-cell good">{c.gps > 0 ? c.gps.toFixed(2) : '—'}</td>
                   <td className="calc-cell highlight">{c.efficiency > 0 ? c.efficiency.toFixed(1) + '%' : '—'}</td>
+                  <td className="calc-cell good">{c.grossKgs > 0 ? c.yieldPct.toFixed(1) + '%' : '—'}</td>
+                  <td className="calc-cell warn">{c.hasAuto && c.spinLossPct !== null ? c.spinLossPct.toFixed(2) + '%' : '—'}</td>
+                  <td className="calc-cell warn">{c.hasAuto && c.autoLossPct !== null ? c.autoLossPct.toFixed(2) + '%' : '—'}</td>
                   <td>
                     <div className="row-actions">
                       <button className="row-btn save-btn" onClick={() => saveRow(i)} title="Save row" disabled={row._status === 'saved'}>

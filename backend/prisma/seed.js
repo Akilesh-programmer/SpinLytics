@@ -139,6 +139,12 @@ async function main() {
       const wasteKgs = rand(0.015, 0.1, 3);
       const stoppage = Math.random() > 0.85 ? pick(STOPPAGES) : null;
 
+      // Compute gross for autocorner calculation
+      const grossKgs = actualHK * countInfo.stdConstant;
+      // Autocorner = gross minus spinning loss (2-5% of gross)
+      const spinLossFraction = rand(0.02, 0.05, 4);
+      const autocornerKg = +(grossKgs * (1 - spinLossFraction)).toFixed(3);
+
       prodEntries.push({
         date: date(d),
         shiftHours: 12.0,
@@ -152,6 +158,7 @@ async function main() {
         runHrs,
         idleSpindles: idle,
         wasteKgs,
+        autocornerKg,
         stoppages: stoppage,
       });
     }

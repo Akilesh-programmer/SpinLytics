@@ -34,6 +34,14 @@ function enrichWithCalculations(entry) {
   // Formula 6: Efficiency % = (Actual HK / STD HK) × 100
   const efficiency = calc.efficiencyPercent(actualHK, stdHK);
 
+  // 2-Stage Loss Analysis (only when autocornerKg is provided)
+  const autoKg = entry.autocornerKg;
+  const spinLossKg = calc.spinningLossKg(grossKgs, autoKg);
+  const spinLossPct = calc.spinningLossPercent(grossKgs, autoKg);
+  const autoLossKg = calc.autocornerLossKg(autoKg, netKgs);
+  const autoLossPct = calc.autocornerLossPercent(autoKg, netKgs);
+  const yieldPct = calc.overallYieldPercent(netKgs, grossKgs);
+
   return {
     ...entry,
     calculated: {
@@ -43,6 +51,12 @@ function enrichWithCalculations(entry) {
       workedSpindles: ws.toFixed(1),
       gramsPerSpindle: gps.toFixed(4),
       efficiencyPercent: efficiency.toFixed(2),
+      overallYieldPercent: yieldPct.toFixed(2),
+      // 2-stage loss (null if autocorner not entered)
+      spinningLossKg: spinLossKg !== null ? spinLossKg.toFixed(3) : null,
+      spinningLossPercent: spinLossPct !== null ? spinLossPct.toFixed(2) : null,
+      autocornerLossKg: autoLossKg !== null ? autoLossKg.toFixed(3) : null,
+      autocornerLossPercent: autoLossPct !== null ? autoLossPct.toFixed(2) : null,
     },
   };
 }
@@ -65,6 +79,7 @@ async function createSingle(data) {
       runHrs: data.runHrs,
       idleSpindles: data.idleSpindles || 0,
       wasteKgs: data.wasteKgs,
+      autocornerKg: data.autocornerKg != null ? data.autocornerKg : null,
       stoppages: data.stoppages || null,
     },
   });
@@ -95,6 +110,7 @@ async function createBatch(data) {
           runHrs: row.runHrs,
           idleSpindles: row.idleSpindles || 0,
           wasteKgs: row.wasteKgs,
+          autocornerKg: row.autocornerKg != null ? row.autocornerKg : null,
           stoppages: row.stoppages || null,
         },
       })

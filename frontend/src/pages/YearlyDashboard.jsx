@@ -12,6 +12,9 @@ import {
   ArrowDown,
   Clock,
   Activity,
+  Award,
+  Package,
+  Layers,
 } from "lucide-react";
 import { useApi } from "../hooks/useApi";
 import { useDateNavigation } from "../hooks/useDateNavigation";
@@ -90,6 +93,18 @@ export default function YearlyDashboard() {
     activeMonths.length > 0 ? yearlyGross / activeMonths.length : 0;
   const yearlyWastePct =
     yearlyGross > 0 ? ((yearlyShiftWaste / yearlyGross) * 100).toFixed(2) : "0";
+  const yearlyYieldPct =
+    yearlyGross > 0 ? ((yearlyNet / yearlyGross) * 100).toFixed(2) : "0";
+  
+  // Autocorner aggregation
+  const yearlyAutocorner = months.reduce(
+    (s, m) => s + parseFloat(m.production?.totalAutocornerKgs || 0), 0,
+  );
+  const hasYearlyAutocorner = months.some(m => m.production?.hasAutocornerData);
+  const yearlySpinLossPct = hasYearlyAutocorner && yearlyGross > 0
+    ? (((yearlyGross - yearlyAutocorner) / yearlyGross) * 100).toFixed(2) : null;
+  const yearlyAutoLossPct = hasYearlyAutocorner && yearlyAutocorner > 0
+    ? (((yearlyAutocorner - yearlyNet) / yearlyAutocorner) * 100).toFixed(2) : null;
 
   // Energy
   const yearlyEB = months.reduce(
@@ -153,6 +168,17 @@ export default function YearlyDashboard() {
   const bestMonth = sortedByProd[0];
   const worstMonth = sortedByProd[sortedByProd.length - 1];
 
+  // Best/Worst UKG months
+  const ukgMonths = activeMonths.filter(
+    (m) => parseFloat(m.energy?.ukg || 0) > 0,
+  );
+  const bestUkgMonth = ukgMonths.length > 0
+    ? ukgMonths.reduce((a, b) => parseFloat(a.energy?.ukg || 999) < parseFloat(b.energy?.ukg || 999) ? a : b)
+    : null;
+  const worstUkgMonth = ukgMonths.length > 0
+    ? ukgMonths.reduce((a, b) => parseFloat(a.energy?.ukg || 0) > parseFloat(b.energy?.ukg || 0) ? a : b)
+    : null;
+
   // Charts
   const chartData = months.map((m, i) => ({
     name: MONTH_NAMES[i],
@@ -175,6 +201,7 @@ export default function YearlyDashboard() {
     grossKgs: Number(m.production?.totalGrossKgs || 0).toFixed(1),
     netKgs: Number(m.production?.totalNetKgs || 0).toFixed(1),
     shiftWaste: Number(m.production?.totalShiftWasteKgs || 0).toFixed(1),
+    yieldPct: m.production?.overallYieldPercent || "-",
     avgEfficiency: m.production?.avgEfficiency || "-",
     realisation: m.metrics?.yarnRealisationPercent || "-",
     waste: m.metrics?.wastePercent || "-",
@@ -193,6 +220,17 @@ export default function YearlyDashboard() {
       label: "Waste (kg)",
       align: "right",
       render: (v) => <span style={{ color: "var(--accent-amber)" }}>{v}</span>,
+    },
+    {
+      key: "yieldPct",
+      label: "Yield %",
+      align: "right",
+      render: (v) =>
+        v !== "-" ? (
+          <span style={{ color: "var(--accent-emerald)" }}>{v}%</span>
+        ) : (
+          "-"
+        ),
     },
     {
       key: "avgEfficiency",
@@ -312,6 +350,49 @@ export default function YearlyDashboard() {
             delay={4}
           />
         </div>
+        <div className="grid-4" style={{ marginTop: '12px' }}>
+          <KPICard
+            label="Overall Yield"
+            value={yearlyYieldPct}
+            unit="%"
+            icon={Percent}
+            color="emerald"
+            delay={5}
+            sub="Net / Gross × 100"
+          />
+          <KPICard
+            label="Total Packing"
+            value={yearlyNet.toFixed(0)}
+            unit="kg"
+            icon={Package}
+            color="teal"
+            delay={6}
+            sub="Net Production = Packed Output"
+          />
+          <KPICard
+            label="Total Lost"
+            value={(yearlyGross - yearlyNet).toFixed(0)}
+            unit="kg"
+            icon={ArrowDown}
+            color="red"
+            delay={7}
+            sub="Gross − Net"
+          />
+          <KPICard
+            label="Total Days"
+            value={totalDays}
+            icon={Clock}
+            color="blue"
+            delay={8}
+          />
+        </div>
+        {hasYearlyAutocorner && (
+          <div className="grid-4" style={{ marginTop: '12px' }}>
+            <KPICard label="Autocorner" value={yearlyAutocorner.toFixed(0)} unit="kg" icon={Layers} color="teal" sub="Total after spinning" />
+            <KPICard label="Spinning Loss" value={`${yearlySpinLossPct}%`} icon={TrendingDown} color="amber" sub={`${(yearlyGross - yearlyAutocorner).toFixed(0)} kg`} />
+            <KPICard label="Autocorner Loss" value={`${yearlyAutoLossPct}%`} icon={TrendingDown} color="red" sub={`${(yearlyAutocorner - yearlyNet).toFixed(0)} kg`} />
+          </div>
+        )}
       </div>
 
       {/* Energy */}
@@ -443,6 +524,24 @@ export default function YearlyDashboard() {
               sub="Gross − Net"
             />
           </div>
+          {bestUkgMonth && worstUkgMonth && (
+            <div className="grid-4" style={{ marginTop: '12px' }}>
+              <KPICard
+                label="Best UKG Month"
+                value={MONTH_NAMES[bestUkgMonth.month - 1]}
+                icon={Gauge}
+                color="emerald"
+                sub={`UKG: ${bestUkgMonth.energy?.ukg}`}
+              />
+              <KPICard
+                label="Worst UKG Month"
+                value={MONTH_NAMES[worstUkgMonth.month - 1]}
+                icon={Gauge}
+                color="amber"
+                sub={`UKG: ${worstUkgMonth.energy?.ukg}`}
+              />
+            </div>
+          )}
         </div>
       )}
 

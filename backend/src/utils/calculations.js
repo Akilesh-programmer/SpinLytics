@@ -189,6 +189,57 @@ function ukg(ebUnits, productionKg) {
   return new Decimal(ebUnits).dividedBy(prod);
 }
 
+// ═══════════════════════════════════════════════════
+// 2-STAGE LOSS ANALYSIS (Spinning Loss + Autocorner Loss)
+// ═══════════════════════════════════════════════════
+
+/**
+ * Spinning Loss (kg) = Gross Production − Autocorner
+ * Material lost during the spinning process
+ */
+function spinningLossKg(grossKgs, autocornerKg) {
+  if (!autocornerKg && autocornerKg !== 0) return null;
+  return new Decimal(grossKgs).minus(autocornerKg);
+}
+
+/**
+ * Spinning Loss % = (Gross − Autocorner) / Gross × 100
+ */
+function spinningLossPercent(grossKgs, autocornerKg) {
+  if (!autocornerKg && autocornerKg !== 0) return null;
+  const gross = new Decimal(grossKgs);
+  if (gross.isZero()) return new Decimal(0);
+  return gross.minus(autocornerKg).dividedBy(gross).times(100);
+}
+
+/**
+ * Autocorner Loss (kg) = Autocorner − Net Production (Packing)
+ * Material lost during the autocorner winding process
+ */
+function autocornerLossKg(autocornerKg, netKgs) {
+  if (!autocornerKg && autocornerKg !== 0) return null;
+  return new Decimal(autocornerKg).minus(netKgs);
+}
+
+/**
+ * Autocorner Loss % = (Autocorner − Net) / Autocorner × 100
+ */
+function autocornerLossPercent(autocornerKg, netKgs) {
+  if (!autocornerKg && autocornerKg !== 0) return null;
+  const auto = new Decimal(autocornerKg);
+  if (auto.isZero()) return new Decimal(0);
+  return auto.minus(netKgs).dividedBy(auto).times(100);
+}
+
+/**
+ * Overall Yield % = Net (Packing) / Gross (Production) × 100
+ */
+function overallYieldPercent(netKgs, grossKgs) {
+  const gross = new Decimal(grossKgs);
+  if (gross.isZero()) return new Decimal(0);
+  return new Decimal(netKgs).dividedBy(gross).times(100);
+}
+
 module.exports = {
   bagToKg,
   // 2026 Standard — Shift Production
@@ -198,6 +249,12 @@ module.exports = {
   workedSpindles,
   gramsPerSpindle,
   efficiencyPercent,
+  // 2-Stage Loss Analysis
+  spinningLossKg,
+  spinningLossPercent,
+  autocornerLossKg,
+  autocornerLossPercent,
+  overallYieldPercent,
   // Stock / EB
   ebUnitsConsumed,
   totalCottonIssue,

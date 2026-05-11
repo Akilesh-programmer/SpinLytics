@@ -62,6 +62,10 @@ async function getDailySummary(date) {
     countGroups[c].totalWasteKgs += parseFloat(entry.wasteKgs);
     countGroups[c].totalActualHK += parseFloat(entry.actualHK);
     countGroups[c].totalStdHK += parseFloat(entry.stdHK);
+    if (entry.autocornerKg != null) {
+      countGroups[c].totalAutocornerKgs = (countGroups[c].totalAutocornerKgs || 0) + parseFloat(entry.autocornerKg);
+      countGroups[c].hasAutocorner = true;
+    }
   }
 
   const countSummaries = Object.values(countGroups).map((g) => ({
@@ -78,6 +82,17 @@ async function getDailySummary(date) {
       g.totalStdHK > 0
         ? ((g.totalActualHK / g.totalStdHK) * 100).toFixed(2)
         : "0.00",
+    overallYieldPercent:
+      g.totalGrossKgs > 0
+        ? ((g.totalNetKgs / g.totalGrossKgs) * 100).toFixed(2)
+        : "0.00",
+    ...(g.hasAutocorner ? {
+      autocornerKgs: (g.totalAutocornerKgs || 0).toFixed(3),
+      spinningLossKg: (g.totalGrossKgs - (g.totalAutocornerKgs || 0)).toFixed(3),
+      spinningLossPercent: g.totalGrossKgs > 0 ? (((g.totalGrossKgs - (g.totalAutocornerKgs || 0)) / g.totalGrossKgs) * 100).toFixed(2) : "0.00",
+      autocornerLossKg: ((g.totalAutocornerKgs || 0) - g.totalNetKgs).toFixed(3),
+      autocornerLossPercent: (g.totalAutocornerKgs || 0) > 0 ? ((((g.totalAutocornerKgs || 0) - g.totalNetKgs) / (g.totalAutocornerKgs || 1)) * 100).toFixed(2) : "0.00",
+    } : {}),
   }));
 
   // ─── Grand totals ───
@@ -96,6 +111,9 @@ async function getDailySummary(date) {
   );
   const grandStdHK = enriched.reduce((s, e) => s + parseFloat(e.stdHK), 0);
 
+  const grandAutocorner = enriched.reduce((s, e) => s + (e.autocornerKg != null ? parseFloat(e.autocornerKg) : 0), 0);
+  const hasAnyAutocorner = enriched.some(e => e.autocornerKg != null);
+
   const totals = {
     totalGrossKgs: grandGross.toFixed(3),
     totalNetKgs: grandNet.toFixed(3),
@@ -104,10 +122,26 @@ async function getDailySummary(date) {
       grandGross > 0 ? ((grandWaste / grandGross) * 100).toFixed(2) : "0.00",
     avgEfficiency:
       grandStdHK > 0 ? ((grandActualHK / grandStdHK) * 100).toFixed(2) : "0.00",
+    overallYieldPercent:
+      grandGross > 0 ? ((grandNet / grandGross) * 100).toFixed(2) : "0.00",
+    totalLostKg: (grandGross - grandNet).toFixed(3),
     entryCount: enriched.length,
+    ...(hasAnyAutocorner ? {
+      totalAutocornerKgs: grandAutocorner.toFixed(3),
+      spinningLossKg: (grandGross - grandAutocorner).toFixed(3),
+      spinningLossPercent: grandGross > 0 ? (((grandGross - grandAutocorner) / grandGross) * 100).toFixed(2) : "0.00",
+      autocornerLossKg: (grandAutocorner - grandNet).toFixed(3),
+      autocornerLossPercent: grandAutocorner > 0 ? (((grandAutocorner - grandNet) / grandAutocorner) * 100).toFixed(2) : "0.00",
+    } : {}),
+    hasAutocornerData: hasAnyAutocorner,
   };
 
-  return { date, entries: enriched, countSummaries, totals };
+  // Collect stoppages/remarks
+  const stoppages = enriched
+    .filter((e) => e.stoppages)
+    .map((e) => ({ rfNo: e.rfNo, count: e.count, stoppages: e.stoppages }));
+
+  return { date, entries: enriched, countSummaries, totals, stoppages };
 }
 
 /**
@@ -151,6 +185,8 @@ async function getMonthlySummary(year, month) {
   let totalShiftWaste = 0;
   let totalActualHK = 0;
   let totalStdHK = 0;
+  let totalAutocornerKgs = 0;
+  let hasAutocorner = false;
 
   // Count-wise (frame-wise) breakdown
   const countMap = {};
@@ -167,6 +203,10 @@ async function getMonthlySummary(year, month) {
     totalShiftWaste += waste;
     totalActualHK += actualHK;
     totalStdHK += stdHK;
+    if (entry.autocornerKg != null) {
+      totalAutocornerKgs += parseFloat(entry.calculated.productionKgsGross) > 0 ? parseFloat(entry.autocornerKg) : 0;
+      hasAutocorner = true;
+    }
 
     // Group by count (frame)
     const c = entry.count;
@@ -184,6 +224,10 @@ async function getMonthlySummary(year, month) {
     countMap[c].wasteKgs += waste;
     countMap[c].actualHK += actualHK;
     countMap[c].stdHK += stdHK;
+    if (entry.autocornerKg != null) {
+      countMap[c].autocornerKgs = (countMap[c].autocornerKgs || 0) + parseFloat(entry.autocornerKg);
+      countMap[c].hasAutocorner = true;
+    }
   }
 
   // Count-wise production breakdown
@@ -198,10 +242,20 @@ async function getMonthlySummary(year, month) {
         : "0.00",
     avgEfficiency:
       data.stdHK > 0 ? ((data.actualHK / data.stdHK) * 100).toFixed(2) : "0.00",
+    overallYieldPercent:
+      data.grossKgs > 0 ? ((data.netKgs / data.grossKgs) * 100).toFixed(2) : "0.00",
     percentOfTotal:
       totalGrossKgs > 0
         ? ((data.grossKgs / totalGrossKgs) * 100).toFixed(1)
         : "0.0",
+    // 2-stage loss (only if autocorner data exists for this count)
+    ...(data.hasAutocorner ? {
+      autocornerKgs: (data.autocornerKgs || 0).toFixed(3),
+      spinningLossKg: (data.grossKgs - (data.autocornerKgs || 0)).toFixed(3),
+      spinningLossPercent: data.grossKgs > 0 ? (((data.grossKgs - (data.autocornerKgs || 0)) / data.grossKgs) * 100).toFixed(2) : "0.00",
+      autocornerLossKg: ((data.autocornerKgs || 0) - data.netKgs).toFixed(3),
+      autocornerLossPercent: (data.autocornerKgs || 0) > 0 ? ((((data.autocornerKgs || 0) - data.netKgs) / (data.autocornerKgs || 1)) * 100).toFixed(2) : "0.00",
+    } : {}),
   }));
 
   // Days recorded
@@ -266,6 +320,44 @@ async function getMonthlySummary(year, month) {
   const invLoss = calc.invisibleLoss(yarnRealisation, wastePct);
   const monthlyUkg = calc.ukg(ebUnits, totalGrossKgs);
 
+  // ═══ OVERALL YIELD & TOTAL LOST ═══
+  const overallYieldPct =
+    totalGrossKgs > 0 ? (totalNetKgs / totalGrossKgs) * 100 : 0;
+  const totalLostKg = totalGrossKgs - totalNetKgs;
+
+  // ═══ DAY PERFORMANCE ═══
+  const dayMap = {};
+  for (const entry of enriched) {
+    const dayKey = entry.date.toISOString().split("T")[0];
+    if (!dayMap[dayKey]) dayMap[dayKey] = { gross: 0, net: 0, waste: 0, actualHK: 0, stdHK: 0 };
+    dayMap[dayKey].gross += parseFloat(entry.calculated.productionKgsGross);
+    dayMap[dayKey].net += parseFloat(entry.calculated.actualProductionKgs);
+    dayMap[dayKey].waste += parseFloat(entry.wasteKgs);
+    dayMap[dayKey].actualHK += parseFloat(entry.actualHK);
+    dayMap[dayKey].stdHK += parseFloat(entry.stdHK);
+  }
+
+  const dayEntries = Object.entries(dayMap).map(([date, d]) => ({
+    date,
+    gross: d.gross,
+    net: d.net,
+    waste: d.waste,
+    efficiency: d.stdHK > 0 ? (d.actualHK / d.stdHK) * 100 : 0,
+    yieldPct: d.gross > 0 ? (d.net / d.gross) * 100 : 0,
+  }));
+
+  let dayPerformance = null;
+  if (dayEntries.length > 0) {
+    const bestDay = dayEntries.reduce((a, b) => (b.gross > a.gross ? b : a));
+    const lowestDay = dayEntries.reduce((a, b) => (b.gross < a.gross ? b : a));
+    const bestEffDay = dayEntries.reduce((a, b) => (b.efficiency > a.efficiency ? b : a));
+    dayPerformance = {
+      bestDay: { date: bestDay.date, grossKgs: bestDay.gross.toFixed(3) },
+      lowestDay: { date: lowestDay.date, grossKgs: lowestDay.gross.toFixed(3) },
+      bestEfficiencyDay: { date: bestEffDay.date, efficiency: bestEffDay.efficiency.toFixed(2) },
+    };
+  }
+
   return {
     year,
     month,
@@ -281,6 +373,17 @@ async function getMonthlySummary(year, month) {
         totalStdHK > 0
           ? ((totalActualHK / totalStdHK) * 100).toFixed(2)
           : "0.00",
+      overallYieldPercent: overallYieldPct.toFixed(2),
+      totalLostKg: totalLostKg.toFixed(3),
+      // 2-stage loss analysis (only when autocorner data present)
+      ...(hasAutocorner ? {
+        totalAutocornerKgs: totalAutocornerKgs.toFixed(3),
+        spinningLossKg: (totalGrossKgs - totalAutocornerKgs).toFixed(3),
+        spinningLossPercent: totalGrossKgs > 0 ? (((totalGrossKgs - totalAutocornerKgs) / totalGrossKgs) * 100).toFixed(2) : "0.00",
+        autocornerLossKg: (totalAutocornerKgs - totalNetKgs).toFixed(3),
+        autocornerLossPercent: totalAutocornerKgs > 0 ? (((totalAutocornerKgs - totalNetKgs) / totalAutocornerKgs) * 100).toFixed(2) : "0.00",
+      } : {}),
+      hasAutocornerData: hasAutocorner,
       daysRecorded,
       countBreakdown,
     },
@@ -296,11 +399,14 @@ async function getMonthlySummary(year, month) {
       wastePercent: wastePct.toFixed(2),
       invisibleLossPercent: invLoss.toFixed(2),
       totalStockWasteKg: stockWaste.toFixed(3),
+      rawMaterialEfficiencyPercent:
+        cottonIssue > 0 ? ((totalGrossKgs / cottonIssue) * 100).toFixed(2) : "0.00",
     },
     energy: {
       ebUnitsConsumed: ebUnits.toFixed(3),
       ukg: monthlyUkg.toFixed(4),
     },
+    dayPerformance,
   };
 }
 

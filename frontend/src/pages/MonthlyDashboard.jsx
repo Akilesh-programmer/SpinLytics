@@ -14,6 +14,8 @@ import {
   Percent,
   Clock,
   Activity,
+  ArrowDown,
+  Award,
 } from "lucide-react";
 import { useApi } from "../hooks/useApi";
 import { useDateNavigation } from "../hooks/useDateNavigation";
@@ -157,6 +159,8 @@ export default function MonthlyDashboard() {
     wasteKgs: d.wasteKgs.toFixed(1),
     wastePct:
       d.grossKgs > 0 ? ((d.wasteKgs / d.grossKgs) * 100).toFixed(1) : "0",
+    yieldPct:
+      d.grossKgs > 0 ? ((d.netKgs / d.grossKgs) * 100).toFixed(1) : "0",
     avgEfficiency: d.avgEfficiency ? d.avgEfficiency.toFixed(1) : "—",
   }));
 
@@ -175,6 +179,12 @@ export default function MonthlyDashboard() {
       label: "Waste %",
       align: "right",
       render: (v) => <span style={{ color: "var(--accent-amber)" }}>{v}%</span>,
+    },
+    {
+      key: "yieldPct",
+      label: "Yield %",
+      align: "right",
+      render: (v) => <span style={{ color: "var(--accent-emerald)" }}>{v}%</span>,
     },
     {
       key: "avgEfficiency",
@@ -247,15 +257,51 @@ export default function MonthlyDashboard() {
             sub="Actual HK / STD HK"
           />
           <KPICard
+            label="Overall Yield"
+            value={production.overallYieldPercent || "0"}
+            unit="%"
+            icon={Percent}
+            color="blue"
+            delay={4}
+            sub="Net / Gross × 100"
+          />
+        </div>
+        <div className="grid-4" style={{ marginTop: '12px' }}>
+          <KPICard
             label="Avg Daily"
             value={avgDailyProd.toFixed(1)}
             unit="kg/day"
             icon={Scale}
             color="purple"
-            delay={4}
+            delay={5}
             sub={`${daysRecorded} days recorded`}
           />
+          <KPICard
+            label="Total Lost"
+            value={Number(production.totalLostKg || 0).toFixed(1)}
+            unit="kg"
+            icon={ArrowDown}
+            color="red"
+            delay={6}
+            sub="Gross − Net"
+          />
+          <KPICard
+            label="Total Packing"
+            value={totalNet.toFixed(1)}
+            unit="kg"
+            icon={Package}
+            color="emerald"
+            delay={7}
+            sub="Net Production = Packed Output"
+          />
         </div>
+        {production.hasAutocornerData && (
+          <div className="grid-4" style={{ marginTop: '12px' }}>
+            <KPICard label="Autocorner" value={Number(production.totalAutocornerKgs).toFixed(1)} unit="kg" icon={Layers} color="teal" sub="After spinning, before packing" />
+            <KPICard label="Spinning Loss" value={`${production.spinningLossPercent}%`} icon={TrendingDown} color="amber" sub={`${Number(production.spinningLossKg).toFixed(1)} kg`} />
+            <KPICard label="Autocorner Loss" value={`${production.autocornerLossPercent}%`} icon={TrendingDown} color="red" sub={`${Number(production.autocornerLossKg).toFixed(1)} kg`} />
+          </div>
+        )}
       </div>
 
       {/* Count-wise breakdown */}
@@ -411,7 +457,52 @@ export default function MonthlyDashboard() {
             sub="100 − Realisation − Waste"
           />
         </div>
+        {metrics?.rawMaterialEfficiencyPercent && (
+          <div className="grid-3" style={{ marginTop: '12px' }}>
+            <KPICard
+              label="Raw Material Efficiency"
+              value={metrics.rawMaterialEfficiencyPercent}
+              unit="%"
+              icon={FlaskConical}
+              color="emerald"
+              delay={16}
+              sub="Gross Prod / Cotton Issue × 100"
+            />
+          </div>
+        )}
       </div>
+
+      {/* Day Performance */}
+      {data?.dayPerformance && (
+        <div className="monthly-section">
+          <h3 className="section-title">
+            <Award size={18} /> Day Performance
+          </h3>
+          <div className="grid-3">
+            <KPICard
+              label="Best Day (Production)"
+              value={new Date(data.dayPerformance.bestDay.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+              icon={Factory}
+              color="emerald"
+              sub={`${Number(data.dayPerformance.bestDay.grossKgs).toFixed(1)} kg`}
+            />
+            <KPICard
+              label="Lowest Day"
+              value={new Date(data.dayPerformance.lowestDay.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+              icon={ArrowDown}
+              color="amber"
+              sub={`${Number(data.dayPerformance.lowestDay.grossKgs).toFixed(1)} kg`}
+            />
+            <KPICard
+              label="Best Efficiency Day"
+              value={new Date(data.dayPerformance.bestEfficiencyDay.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+              icon={Gauge}
+              color="cyan"
+              sub={`${data.dayPerformance.bestEfficiencyDay.efficiency}%`}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Charts */}
       <div className="monthly-section">

@@ -23,6 +23,7 @@ const shiftProductionRowSchema = z.object({
     .min(0, "Idle Spindles cannot be negative")
     .default(0),
   wasteKgs: z.number().min(0, "Waste Kgs cannot be negative"),
+  autocornerKg: z.number().min(0, "Autocorner Kg cannot be negative").optional().nullable(),
   stoppages: z.string().max(500).optional().nullable(),
 });
 
@@ -52,6 +53,7 @@ const createShiftProductionBatchSchema = z.object({
           .min(0, "Idle Spindles cannot be negative")
           .default(0),
         wasteKgs: z.number().min(0, "Waste Kgs cannot be negative"),
+        autocornerKg: z.number().min(0, "Autocorner Kg cannot be negative").optional().nullable(),
         stoppages: z.string().max(500).optional().nullable(),
       }),
     )
